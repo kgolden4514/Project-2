@@ -1,0 +1,174 @@
+
+# Entertainment
+```{r}
+# #Create data_channel_is_lifestyle dataset
+# #Take out all data_Channel_is columns that are not relevant to this data set
+# entertainment <- online[ , -c(12, 14:17)] 
+# 
+# #Filter out the zeros from the remaining data_channel_is column
+# entertainment <- entertainment %>%
+#                  filter(data_channel_is_entertainment == 1)
+# 
+# #Drop the data_channel_is column
+# entertainment <- entertainment[ , -c(12)]
+# entertainment <- entertainment[ , c(53, 1:52)]
+# 
+# #Split the data into training and test
+# set.seed(5432)
+# 
+# # Split the data into a training and test set (70/30 split)
+# # indices
+# 
+# train <- sample(1:nrow(entertainment), size = nrow(entertainment)*.70)
+# test <- setdiff(1:nrow(entertainment), train)
+# 
+# # trainiing and testing subsets
+# entertainment_train <- entertainment[train, ]
+# entertainment_test <- entertainment[test, ]
+```  
+
+# Business
+```{r}
+# #Create data_channel_is_bus dataset
+# #Take out all data_Channel_is columns that are not relevant to this data set
+# business <- online[ , -c(12:13, 15:17)] 
+# 
+# #Filter out the zeros from the remaining data_channel_is column
+# business <- business %>%
+#             filter(data_channel_is_bus == 1)
+# 
+# #Drop the data_channel_is column
+# business <- business[ , -c(12)]
+# business <- business[ , c(53, 1:52)]
+# 
+# #Split the data into training and test
+# set.seed(5432)
+# 
+# # Split the data into a training and test set (70/30 split)
+# # indices
+# 
+# train <- sample(1:nrow(business), size = nrow(business)*.70)
+# test <- setdiff(1:nrow(business), train)
+# 
+# # trainiing and testing subsets
+# business_train <- business[train, ]
+# business_test <- business[test, ]
+```  
+
+#Social Media
+```{r}
+# #Create data_channel_is_socmed dataset
+# #Take out all data_Channel_is columns that are not relevant to this data set
+# social_media <- online[ , -c(12:14, 16:17)] 
+# 
+# #Filter out the zeros from the remaining data_channel_is column
+# social_media <- social_media %>%
+#                 filter(data_channel_is_socmed == 1)
+# 
+# #Drop the data_channel_is column
+# social_media <- social_media[ , -c(12)]
+# social_media <- social_media[ , c(53, 1:52)]
+# 
+# #Split the data into training and test
+# set.seed(5432)
+# 
+# # Split the data into a training and test set (70/30 split)
+# # indices
+# 
+# train <- sample(1:nrow(social_media), size = nrow(social_media)*.70)
+# test <- setdiff(1:nrow(social_media), train)
+# 
+# # trainiing and testing subsets
+# social_media_train <- social_media[train, ]
+# social_media_test <- social_media[test, ]
+```  
+
+#Tech
+```{r}
+# #Create data_channel_is_tech dataset
+# #Take out all data_Channel_is columns that are not relevant to this data set
+# tech <- online[ , -c(12:15, 17)] 
+# 
+# #Filter out the zeros from the remaining data_channel_is column
+# tech <- tech %>%
+#         filter(data_channel_is_tech == 1)
+# 
+# #Drop the data_channel_is column
+# tech <- tech[ , -c(12)]
+# tech <- tech[ , c(53, 1:52)]
+# 
+# #Split the data into training and test
+# set.seed(5432)
+# 
+# # Split the data into a training and test set (70/30 split)
+# # indices
+# 
+# train <- sample(1:nrow(tech), size = nrow(tech)*.70)
+# test <- setdiff(1:nrow(tech), train)
+# 
+# # trainiing and testing subsets
+# tech_train <- tech[train, ]
+# tech_test <- tech[test, ]
+```  
+
+#World
+```{r}
+# #Create data_channel_is_world dataset
+# #Take out all data_Channel_is columns that are not relevant to this data set
+# world <- online[ , -c(12:16)] 
+# 
+# #Filter out the zeros from the remaining data_channel_is column
+# world <- world %>%
+#          filter(data_channel_is_world == 1)
+# 
+# #Drop the data_channel_is column
+# world <- world[ , -c(12)]
+# world <- world[ , c(53, 1:52)]
+# 
+# #Split the data into training and test#
+# set.seed(5432)
+# 
+# # Split the data into a training and test set (70/30 split)
+# # indices
+# 
+# train <- sample(1:nrow(world), size = nrow(world)*.70)
+# test <- setdiff(1:nrow(world), train)
+# 
+# # trainiing and testing subsets
+# world_train <- world[train, ]
+# world_test <- world[test, ]
+```
+
+
+# Lifestyle
+```{r}
+# #Create data_channel_is_lifestyle dataset
+# #Take out all data_Channel_is columns that are not relevant to this data set
+# lifestyle <- online[ , -c(13:17)] 
+# 
+# 
+# #Filter out the zeros from the remaining data_channel_is column
+# lifestyle <- lifestyle %>%
+#              filter(data_channel_is_lifestyle == 1)
+# 
+# #Drop the data_channel_is column
+# lifestyle <- lifestyle[ , -c(12)] 
+# lifestyle <- lifestyle[ , c(53, 1:52)]
+# 
+# #Split the data into training and test
+# set.seed(5432)
+# 
+# # Split the data into a training and test set (70/30 split)
+# # indices
+# 
+# train <- sample(1:nrow(lifestyle), size = nrow(lifestyle)*.70)
+# test <- setdiff(1:nrow(lifestyle), train)
+# 
+# # trainiing and testing subsets
+# lifestyle_train <- lifestyle[train, ]
+# lifestyle_test <- lifestyle[test, ]
+
+```  
+``
+
+

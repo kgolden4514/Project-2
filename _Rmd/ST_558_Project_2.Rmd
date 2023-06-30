@@ -19,11 +19,9 @@ library(corrplot)
 library(qwraps2)
 library(vtable)
 library(psych)
+library(ggplot2)
+library(cowplot)
 ```
-
-
-
-
 
 # Introduction Section  
 
@@ -36,7 +34,53 @@ online <- read.csv('OnlineNewsPopularity.csv')
 
 #Dropped url and timedelta because they are non-predictive. 
 online <- online[ , c(3:61)]
+
+#All trained data sets are in another .Rmd file called Create_dataframes_use_later. These can be copy and pasted when they are necessary
 ```  
+
+#Write Functions
+```{r}
+#Creates Summary Tables for a training dataset
+tables <- function(data_input) {
+  d <- describe(lifestyle_train[ , c('shares')], fast=TRUE)
+  kable(d, caption = 'Shares Summary')
+}
+```
+
+```{r}
+#Create correlation table and graph for a training dataset
+correlation.table <- function(data_input) {
+  #drop binary variables
+  correlations <- cor(subset(data_input, select = c(2:4, 6:24, 33:50)))
+  kable(correlations, caption = 'Correlations Lifestyle')
+}
+```
+
+```{r}
+# Create correlation graph
+corr_simple <- function(data_input,sig=0.5){
+  corr <- cor(subset(data_input, select = c(2:4, 6:24, 33:50)))
+  corr[lower.tri(corr, diag = TRUE)] <- NA
+  corr <- melt(corr, na.rm = TRUE)
+  corr <- subset(corr, abs(value) > 0.5)
+  corr[order(-abs(corr$value)),]
+  print(corr)
+  mtx_corr <- reshape2::acast(corr, Var1~Var2, value.var="value")
+  corrplot(mtx_corr, is.corr=FALSE, tl.col="black", na.label=" ")
+}
+```
+
+```{r}
+# Still working this one out
+# Create scatterplots
+scatterplots <- function(data_input) {
+  
+}
+scatterplots(lifestyle_train)
+```
+
+# Lifestyle
+
 
 ```{r}
 #Create data_channel_is_lifestyle dataset
@@ -65,181 +109,20 @@ test <- setdiff(1:nrow(lifestyle), train)
 lifestyle_train <- lifestyle[train, ]
 lifestyle_test <- lifestyle[test, ]
 
-```
-
-
-```{r}
-#Create data_channel_is_lifestyle dataset
-#Take out all data_Channel_is columns that are not relevant to this data set
-entertainment <- online[ , -c(12, 14:17)] 
-
-#Filter out the zeros from the remaining data_channel_is column
-entertainment <- entertainment %>%
-                 filter(data_channel_is_entertainment == 1)
-
-#Drop the data_channel_is column
-entertainment <- entertainment[ , -c(12)]
-entertainment <- entertainment[ , c(53, 1:52)]
-
-#Split the data into training and test
-set.seed(5432)
-
-# Split the data into a training and test set (70/30 split)
-# indices
-
-train <- sample(1:nrow(entertainment), size = nrow(entertainment)*.70)
-test <- setdiff(1:nrow(entertainment), train)
-
-# trainiing and testing subsets
-entertainment_train <- entertainment[train, ]
-entertainment_test <- entertainment[test, ]
 ```  
 
 ```{r}
-#Create data_channel_is_bus dataset
-#Take out all data_Channel_is columns that are not relevant to this data set
-business <- online[ , -c(12:13, 15:17)] 
-
-#Filter out the zeros from the remaining data_channel_is column
-business <- business %>%
-            filter(data_channel_is_bus == 1)
-
-#Drop the data_channel_is column
-business <- business[ , -c(12)]
-business <- business[ , c(53, 1:52)]
-
-#Split the data into training and test
-set.seed(5432)
-
-# Split the data into a training and test set (70/30 split)
-# indices
-
-train <- sample(1:nrow(business), size = nrow(business)*.70)
-test <- setdiff(1:nrow(business), train)
-
-# trainiing and testing subsets
-business_train <- business[train, ]
-business_test <- business[test, ]
-```  
-
-```{r}
-#Create data_channel_is_socmed dataset
-#Take out all data_Channel_is columns that are not relevant to this data set
-social_media <- online[ , -c(12:14, 16:17)] 
-
-#Filter out the zeros from the remaining data_channel_is column
-social_media <- social_media %>%
-                filter(data_channel_is_socmed == 1)
-
-#Drop the data_channel_is column
-social_media <- social_media[ , -c(12)]
-social_media <- social_media[ , c(53, 1:52)]
-
-#Split the data into training and test
-set.seed(5432)
-
-# Split the data into a training and test set (70/30 split)
-# indices
-
-train <- sample(1:nrow(social_media), size = nrow(social_media)*.70)
-test <- setdiff(1:nrow(social_media), train)
-
-# trainiing and testing subsets
-social_media_train <- social_media[train, ]
-social_media_test <- social_media[test, ]
-```  
-
-```{r}
-#Create data_channel_is_tech dataset
-#Take out all data_Channel_is columns that are not relevant to this data set
-tech <- online[ , -c(12:15, 17)] 
-
-#Filter out the zeros from the remaining data_channel_is column
-tech <- tech %>%
-        filter(data_channel_is_tech == 1)
-
-#Drop the data_channel_is column
-tech <- tech[ , -c(12)]
-tech <- tech[ , c(53, 1:52)]
-
-#Split the data into training and test
-set.seed(5432)
-
-# Split the data into a training and test set (70/30 split)
-# indices
-
-train <- sample(1:nrow(tech), size = nrow(tech)*.70)
-test <- setdiff(1:nrow(tech), train)
-
-# trainiing and testing subsets
-tech_train <- tech[train, ]
-tech_test <- tech[test, ]
-```  
-
-```{r}
-#Create data_channel_is_world dataset
-#Take out all data_Channel_is columns that are not relevant to this data set
-world <- online[ , -c(12:16)] 
-
-#Filter out the zeros from the remaining data_channel_is column
-world <- world %>%
-         filter(data_channel_is_world == 1)
-
-#Drop the data_channel_is column
-world <- world[ , -c(12)]
-world <- world[ , c(53, 1:52)]
-
-#Split the data into training and test#
-set.seed(5432)
-
-# Split the data into a training and test set (70/30 split)
-# indices
-
-train <- sample(1:nrow(world), size = nrow(world)*.70)
-test <- setdiff(1:nrow(world), train)
-
-# trainiing and testing subsets
-world_train <- world[train, ]
-world_test <- world[test, ]
-```
-
-#Write Functions
-```{r}
-#Creates Summary Tables for a training dataset
-tables <- function(data_input) {
-  d <- describe(lifestyle_train[ , c('shares')], fast=TRUE)
-  kable(d, caption = 'Shares Summary')
-}
+#Shares table for lifestyle_train
+tables(lifestyle_train)
 ```
 
 ```{r}
-#Create correlation table and graph for a training dataset
-correlation.table <- function(data_input) {
-  #drop binary variables
-  correlations <- cor(subset(data_input, select = c(2:4, 6:24, 33:50)))
-  kable(correlations, caption = 'Correlations Lifestyle')
-}
+#Correlation table for lifestyle_train
 correlation.table(lifestyle_train)
 ```
 
 ```{r}
-# Create correlation graph
-corr_simple <- function(data_input,sig=0.5){
-  corr <- cor(subset(data_input, select = c(2:4, 6:24, 33:50)))
-  corr[lower.tri(corr, diag = TRUE)] <- NA
-  corr <- melt(corr, na.rm = TRUE)
-  corr <- subset(corr, abs(value) > 0.5)
-  corr[order(-abs(corr$value)),]
-  print(corr)
-  mtx_corr <- reshape2::acast(corr, Var1~Var2, value.var="value")
-  corrplot(mtx_corr, is.corr=FALSE, tl.col="black", na.label=" ")
-}
+#Correlation graph for lifestyle_train
+corr_simple(lifestyle_train)
 ```
-
-```{r}
-#Create contingency tables
-
-```
-
-
 
