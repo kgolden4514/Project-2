@@ -142,7 +142,3 @@ correlation_table(lifestyle_train)
 #Correlation graph for lifestyle_train
 correlation_graph(lifestyle_train)
 ```
-
-```{r}
-
-```
