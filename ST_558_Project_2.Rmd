@@ -1,0 +1,144 @@
+---
+title: "Project 2"
+author: "Kristina Golden and Demetrios Samaras"
+date: "2023-07-02"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+setwd("~/GitHub/ST_558_Project_2")
+options(scipen = 1, digits = 6)
+```
+
+## Required Packages
+
+```{r packages, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(knitr)
+library(GGally)
+library(corrplot)
+library(qwraps2)
+library(vtable)
+library(psych)
+library(ggplot2)
+library(cowplot)
+library(reshape2)
+```
+
+## Introduction
+
+## Read in the Data
+
+```{r data, echo=FALSE, message=FALSE, warning=FALSE}
+setwd("~/GitHub/ST_558_Project_2")
+online <- read.csv('OnlineNewsPopularity.csv')
+colnames(online) <- c('url', 'days', 'n.Title', 'n.Content', 'Rate.Unique', 
+                      'Rate.Nonstop', 'Rate.Unique.Nonstop', 'n.Links', 
+                      'n.Other', 'n.Images', 'n.Videos',
+                      'Avg.Words', 'n.Key', 'Lifestyle', 'Entertainment',
+                      'Business', 'Social.Media', 'Tech', 'World', 'Min.Worst.Key',
+                      'Max.Worst.Key', 'Avg.Worst.Key', 'Min.Best.Key', 
+                      'Max.Best.Key', 'Avg.Best.Key', 'Avg.Min.Key', 'Avg.Max.Key',
+                      'Avg.Avg.Key', 'Min.Ref', 'Max.Ref', 'Avg.Ref', 'Mon', 
+                      'Tues', 'Wed', 'Thurs', 'Fri', 'Sat', 'Sun', 'Weekend',
+                      'LDA_00', 'LDA_01', 'LDA_02', 'LDA_03', 'LDA_04', 
+                      'Global.Subj', 'Global.Pol', 'Global.Pos.Rate',
+                      'Global.Neg.Rate', 'Rate.Pos', 'Rate.Neg', 'Avg.Pos.Pol',
+                      'Min.Pos.Pol', 'Max.Pos.Pol', 'Avg.Neg.Pol', 'Min.Neg.Pol',
+                      'Max.Neg.Pol', 'Title.Subj', 'Title.Pol', 'Abs.Subj',
+                      'Abs.Pol', 'shares')
+#Dropped url and timedelta because they are non-predictive. 
+online <- online[ , c(3:61)]
+
+#All trained data sets are in another .Rmd file called Create_dataframes_use_later. These can be copy and pasted when they are necessary
+```
+
+## Write Functions
+
+```{r summary_table}
+#Creates Summary Tables for a training dataset
+summary_table <- function(data_input) {
+  d <- describe(data_input[ , c('shares')], fast=TRUE)
+  kable(d, caption = 'Shares Summary')
+}
+```
+
+```{r correlation_table}
+#Create correlation table and graph for a training dataset
+correlation_table <- function(data_input) {
+  #drop binary variables
+  correlations <- cor(subset(data_input, select = c(2:4, 6:24, 33:50)))
+  kable(correlations, caption = 'Correlations Lifestyle')
+}
+```
+
+```{r correlation_graph}
+# Create correlation graph
+correlation_graph <- function(data_input,sig=0.5){
+  corr <- cor(subset(data_input, select = c(2:4, 6:24, 33:50)))
+  corr[lower.tri(corr, diag = TRUE)] <- NA
+  corr <- melt(corr, na.rm = TRUE)
+  corr <- subset(corr, abs(value) > 0.5)
+  corr[order(-abs(corr$value)),]
+  print(corr)
+  mtx_corr <- reshape2::acast(corr, Var1~Var2, value.var="value")
+  corrplot(mtx_corr, is.corr=FALSE, tl.col="black", na.label=" ")
+}
+```
+
+```{r scatterplots_WIP}
+# Still working this one out
+# Create scatterplots
+# scatterplots <- function(data_input) {
+#   
+# }
+# scatterplots(lifestyle_train)
+```
+
+## Lifestyle EDA
+
+```{r Lifestyle}
+#Create data_channel_is_lifestyle dataset
+#Take out all data_Channel_is columns that are not relevant to this data set
+lifestyle <- online[ , -c(13:17)] 
+
+
+#Filter out the zeros from the remaining data_channel_is column
+lifestyle <- lifestyle %>%
+             filter(Lifestyle == 1)
+
+#Drop the data_channel_is column
+lifestyle <- lifestyle[ , -c(12)] 
+lifestyle <- lifestyle[ , c(53, 1:52)]
+```
+
+```{r lifestyle_train_test}
+#Split the data into training and test
+set.seed(5432)
+
+# Split the data into a training and test set (70/30 split)
+# indices
+
+train <- sample(1:nrow(lifestyle), size = nrow(lifestyle)*.70)
+test <- setdiff(1:nrow(lifestyle), train)
+
+# trainiing and testing subsets
+lifestyle_train <- lifestyle[train, ]
+lifestyle_test <- lifestyle[test, ]
+```
+
+```{r lifestyle_summary}
+#Shares table for lifestyle_train
+summary_table(lifestyle_train)
+```
+
+```{r lifestyle_corr_table}
+#Correlation table for lifestyle_train
+correlation_table(lifestyle_train)
+```
+
+```{r lifestyle_corr_graph}
+#Correlation graph for lifestyle_train
+correlation_graph(lifestyle_train)
+```
