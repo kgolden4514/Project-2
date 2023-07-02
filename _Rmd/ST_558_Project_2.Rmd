@@ -6,12 +6,12 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, eval = TRUE)
 setwd("~/GitHub/ST_558_Project_2")
 options(scipen = 1, digits = 6)
 ```
 
-```{r}
+```{r library }
 library(tidyverse)
 library(knitr)
 library(GGally)
@@ -21,9 +21,19 @@ library(vtable)
 library(psych)
 library(ggplot2)
 library(cowplot)
+library(caret)
+library(gbm)
+library(randomForest)
+library(tree)
+library(class)
+library(bst)
+library(reshape)
 ```
 
 # Introduction Section  
+
+**this is just a placeholder for now, will do better when I have a better understanding of what is going on** 
+
 
 
 
@@ -38,7 +48,7 @@ online <- online[ , c(3:61)]
 #All trained data sets are in another .Rmd file called Create_dataframes_use_later. These can be copy and pasted when they are necessary
 ```  
 
-#Write Functions
+# Write Functions
 ```{r}
 #Creates Summary Tables for a training dataset
 tables <- function(data_input) {
@@ -78,6 +88,19 @@ scatterplots <- function(data_input) {
 }
 scatterplots(lifestyle_train)
 ```
+
+```{r scaterplots testing, include=FALSE, echo=FALSE, eval=FALSE}
+## delete ## just looking at the way scatter plots look 
+
+g <-ggplot(lifestyle_train,  aes(y=shares, x= num_imgs))
+
+g+ geom_point()
+
+
+
+
+```
+
 
 # Lifestyle
 
@@ -125,4 +148,114 @@ correlation.table(lifestyle_train)
 #Correlation graph for lifestyle_train
 corr_simple(lifestyle_train)
 ```
+
+
+
+# Modeling
+
+## Linear regression 1 
+
+```{r Linear regression 1 }
+## linear regression model using all predictors 
+linear_model_1 <- train( shares ~ ., data = lifestyle_train,
+                         method = "lm",
+                         preProcess = c("center", "scale"),
+                         trControl = trainControl(method = "cv", 
+                                                  number = 5))
+
+## prediction of test with model 
+linear_model_1_pred <- predict(linear_model_1, newdata = dplyr::select(lifestyle_test, -shares))
+
+## storing error of model on test set 
+linear_1_RMSE<- postResample(boosted_tree_model_pred, obs = lifestyle_test$shares)
+
+```
+
+
+
+## Linear regression 2 
+
+
+## Random forest model 
+
+
+## Boosted tree model 
+
+```{r boosted tree tuning, cache=TRUE}
+
+## cross validation on boosted tree method to find optima tuning parameters 
+## DELETE after ## I'm really confused as to why higher values are not giving better rsme for tuning I'm going to go to office hours 7/3 to try to figure out. will use random parameters for now  ## 
+
+## creates grid of possible tuning parameters 
+gbm_grid <-  expand.grid(interaction.depth = c(1:7), 
+  n.trees = (1:10)*50, 
+  shrinkage = 0.1,
+  n.minobsinnode = 20)
+
+## sets trainControl method 
+fit_control <- trainControl(method = "repeatedcv",
+                            number = 5,
+                            repeats= 1)
+
+set.seed(13)
+
+## trains to find optimal tuning parameters except it is giving weird parameters 
+gbm_tree_cv <- train(shares ~ ., data = lifestyle_train,
+                     method = "gbm",
+                     preProcess = c("center", "scale"),
+                     trControl = fit_control,
+                     tuneGrid= gbm_grid,
+                     verbose=FALSE)
+## plot to visualize parameters 
+plot(gbm_tree_cv)
+
+```
+
+```{r boosted tree tuned}
+## creates boosted tree model with tuning parameters n.trees, shrinkage, interaction.depth from CV 
+boosted_tree_model <- gbm(shares ~ ., data = lifestyle_train, 
+                          distribution = "gaussian", 
+                          n.trees = 500 ,
+                          shrinkage = 0.1 , 
+                          interaction.depth = 6 )
+
+## test set prediction
+boosted_tree_model_pred <- predict(boosted_tree_model, newdata = dplyr::select(lifestyle_test, -shares), n.trees = 500)
+
+## stores results 
+boosted_tree_RMSE <- postResample(boosted_tree_model_pred, obs = lifestyle_test$shares)
+
+```
+
+
+# Comparison 
+
+
+```{r comparison of 4 models }
+## creates a data frame of the four models RMSE on the 
+models_RMSE <- data.frame(linear_1_RMSE=linear_1_RMSE[1],
+                        ## delete after ## I can take care of these other two if you want since you did so much of the data stuff just let me know ##
+                         #linear_2_RMSE=linear_2_RMSE[1], 
+                         #random_forest_RMSE=random_forest_RMSE[1]
+                          boosted_tree_RMSE = boosted_tree_RMSE[1] )
+
+## gets the name of the column with the smallest rmse 
+smallest_RMSE<-colnames(models_RMSE)[apply(models_RMSE,1,which.min)]
+
+## declares the model with smallest RSME the winner 
+paste0(" For ", 
+       ## parameter will be lifestyle for this one I think
+       #parameter, 
+       smallest_RMSE, " is the winner")
+
+```
+
+
+
+
+# Automation 
+
+**not completely sure what we are supposed to do for this. I think it is from topic 2 "Automating R Markdown" where we set the parameters in the yaml and then they will be "lifestyle, bus, tech, etc" and then it will go do everything with param=lifestyle,  but let me know if you think there is a better way to do the automation. I will ask him about this 7/3. **
+
+
 
