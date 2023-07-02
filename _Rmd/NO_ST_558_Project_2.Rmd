@@ -1,0 +1,137 @@
+---
+title: "Project 2"
+author: "Kristina Golden and Demetrios Samaras"
+date: "2023-06-30"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+setwd("~/GitHub/ST_558_Project_2")
+options(scipen = 1, digits = 6)
+```
+
+```{r}
+library(tidyverse)
+library(knitr)
+library(GGally)
+library(corrplot)
+library(qwraps2)
+library(vtable)
+library(psych)
+library(ggplot2)
+library(cowplot)
+```
+
+# Introduction Section  
+
+
+
+# Read in the Data
+```{r}
+setwd("~/GitHub/ST_558_Project_2")
+online <- read.csv('OnlineNewsPopularity.csv')
+colnames(online) <- c('url', 'days', 'n.Title', 'n.Content', 'Rate.Unique', 'Rate.Nonstop', 'n.Links', 'n.Other', 
+                      'n.Images', 'n.Videos', 'Avg.Words', 'n.Key', 'Lifestyle', 'Entertainment', 'Business',
+                      'Social.Media', 'Tech', 'World', 'Min.Worst.Key', 'Max.Worst.Key', 'Avg.Worst.Key',
+                      'Min.Best.Key', 'Max.Best.Key', 'Avg.Best.Key', 'Avg.Min.Key', 'Avg.Max.Key', 'Avg.Avg.Key',
+                      'Min.Ref', 'Max.Ref', 'Avg.Ref', 'Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat', 'Sun', 'Weekend',
+                      'LDA_00', 'LDA_01', 'LDA_02', 'LDA_03', 'LDA_04', 'Global.Subj', 'Global.Pol', 'Global.Pos.Rate',
+                      'Global.Neg.Rate', 'Rate.Pos', 'Rate.Neg', 'Avg.Pos.Pol', 'Min.Pos.Pol', 'Max.Pos.Pol',
+                      'Avg.Neg.Pol', 'Min.Neg.Pol', 'Max.Neg.Pol', 'Title.Subj', 'Title.Pol', 'Abs.Subj',
+                      'Abs.Pol', 'shares')
+
+#Dropped url and timedelta because they are non-predictive. 
+online <- online[ , c(3:61)]
+
+#All trained data sets are in another .Rmd file called Create_dataframes_use_later. These can be copy and pasted when they are necessary
+```  
+
+#Write Functions
+```{r}
+#Creates Summary Tables for a training dataset
+tables <- function(data_input) {
+  d <- describe(lifestyle_train[ , c('shares')], fast=TRUE)
+  kable(d, caption = 'Shares Summary')
+}
+```
+
+```{r}
+#Create correlation table and graph for a training dataset
+correlation.table <- function(data_input) {
+  #drop binary variables
+  correlations <- cor(subset(data_input, select = c(2:4, 6:24, 33:50)))
+  kable(correlations, caption = 'Correlations Lifestyle')
+}
+```
+
+```{r}
+# Create correlation graph
+corr_simple <- function(data_input,sig=0.5){
+  corr <- cor(subset(data_input, select = c(2:4, 6:24, 33:50)))
+  corr[lower.tri(corr, diag = TRUE)] <- NA
+  corr <- melt(corr, na.rm = TRUE)
+  corr <- subset(corr, abs(value) > 0.5)
+  corr[order(-abs(corr$value)),]
+  print(corr)
+  mtx_corr <- reshape2::acast(corr, Var1~Var2, value.var="value")
+  corrplot(mtx_corr, is.corr=FALSE, tl.col="black", na.label=" ")
+}
+```
+
+```{r}
+# Still working this one out
+# Create scatterplots
+scatterplots <- function(data_input) {
+  
+}
+scatterplots(lifestyle_train)
+```
+
+# Lifestyle
+
+
+```{r}
+#Create data_channel_is_lifestyle dataset
+#Take out all data_Channel_is columns that are not relevant to this data set
+lifestyle <- online[ , -c(13:17)] 
+
+
+#Filter out the zeros from the remaining data_channel_is column
+lifestyle <- lifestyle %>%
+             filter(data_channel_is_lifestyle == 1)
+
+#Drop the data_channel_is column
+lifestyle <- lifestyle[ , -c(12)] 
+lifestyle <- lifestyle[ , c(53, 1:52)]
+
+#Split the data into training and test
+set.seed(5432)
+
+# Split the data into a training and test set (70/30 split)
+# indices
+
+train <- sample(1:nrow(lifestyle), size = nrow(lifestyle)*.70)
+test <- setdiff(1:nrow(lifestyle), train)
+
+# trainiing and testing subsets
+lifestyle_train <- lifestyle[train, ]
+lifestyle_test <- lifestyle[test, ]
+
+```  
+
+```{r}
+#Shares table for lifestyle_train
+tables(lifestyle_train)
+```
+
+```{r}
+#Correlation table for lifestyle_train
+correlation.table(lifestyle_train)
+```
+
+```{r}
+#Correlation graph for lifestyle_train
+corr_simple(lifestyle_train)
+```
+
