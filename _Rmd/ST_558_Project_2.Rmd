@@ -11,13 +11,9 @@ setwd("~/GitHub/ST_558_Project_2")
 options(scipen = 1, digits = 6)
 ```
 
-<<<<<<< HEAD
-```{r library }
-=======
 ## Required Packages
 
 ```{r packages, message=FALSE, warning=FALSE}
->>>>>>> de2382a4a868212034d8211f3b3cff47b0b5ab4c
 library(tidyverse)
 library(knitr)
 library(GGally)
@@ -27,7 +23,6 @@ library(vtable)
 library(psych)
 library(ggplot2)
 library(cowplot)
-<<<<<<< HEAD
 library(caret)
 library(gbm)
 library(randomForest)
@@ -35,20 +30,14 @@ library(tree)
 library(class)
 library(bst)
 library(reshape)
-=======
 library(reshape2)
->>>>>>> de2382a4a868212034d8211f3b3cff47b0b5ab4c
 ```
 
 ## Introduction
 
-<<<<<<< HEAD
-**this is just a placeholder for now, will do better when I have a better understanding of what is going on** 
+**this is just a placeholder for now, will do better when I have a better understanding of what is going on**
 
-
-=======
 ## Read in the Data
->>>>>>> de2382a4a868212034d8211f3b3cff47b0b5ab4c
 
 ```{r data, echo=FALSE, message=FALSE, warning=FALSE}
 setwd("~/GitHub/ST_558_Project_2")
@@ -74,14 +63,9 @@ online <- online[ , c(3:61)]
 #All trained data sets are in another .Rmd file called Create_dataframes_use_later. These can be copy and pasted when they are necessary
 ```
 
-<<<<<<< HEAD
 # Write Functions
-```{r}
-=======
-## Write Functions
 
 ```{r summary_table}
->>>>>>> de2382a4a868212034d8211f3b3cff47b0b5ab4c
 #Creates Summary Tables for a training dataset
 summary_table <- function(data_input) {
   d <- describe(data_input[ , c('shares')], fast=TRUE)
@@ -121,7 +105,6 @@ correlation_graph <- function(data_input,sig=0.5){
 # scatterplots(lifestyle_train)
 ```
 
-<<<<<<< HEAD
 ```{r scaterplots testing, include=FALSE, echo=FALSE, eval=FALSE}
 ## delete ## just looking at the way scatter plots look 
 
@@ -134,11 +117,23 @@ g+ geom_point()
 
 ```
 
+```{r random_forest}
+random_forest <- function(data_input){
+  rfFit <- randomForest(shares ~., data = data_input,
+                        mtry = ncol(data_input)/3,
+                        ntree = 200,
+                        importance = TRUE)
+  a <- as.data.frame(importance(rfFit))
+  b <- varImpPlot(rfFit)
+  out <- list(b, a)
+  return(out)
+}
+#Note: Need to add crossvalidation to my function
+```
 
 # Lifestyle
-=======
+
 ## Lifestyle EDA
->>>>>>> de2382a4a868212034d8211f3b3cff47b0b5ab4c
 
 ```{r Lifestyle}
 #Create data_channel_is_lifestyle dataset
@@ -184,13 +179,43 @@ correlation_table(lifestyle_train)
 #Correlation graph for lifestyle_train
 correlation_graph(lifestyle_train)
 ```
-<<<<<<< HEAD
 
+# Entertainment
 
+## Entertainment EDA
+
+```{r entertainment}
+#Create data_channel_is_lifestyle dataset
+#Take out all data_Channel_is columns that are not relevant to this data set
+entertainment <- online[ , -c(12, 14:17)]
+
+#Filter out the zeros from the remaining data_channel_is column
+entertainment <- entertainment %>%
+                 filter(Entertainment == 1)
+
+#Drop the data_channel_is column
+entertainment <- entertainment[ , -c(12)]
+entertainment <- entertainment[ , c(53, 1:52)]
+```
+
+```{r entertainment_train_test}
+#Split the data into training and test
+set.seed(5432)
+
+# Split the data into a training and test set (70/30 split)
+# indices
+
+train <- sample(1:nrow(entertainment), size = nrow(entertainment)*.70)
+test <- setdiff(1:nrow(entertainment), train)
+
+# trainiing and testing subsets
+entertainment_train <- entertainment[train, ]
+entertainment_test <- entertainment[test, ]
+```
 
 # Modeling
 
-## Linear regression 1 
+## Linear regression 1
 
 ```{r Linear regression 1 }
 ## linear regression model using all predictors 
@@ -208,15 +233,17 @@ linear_1_RMSE<- postResample(boosted_tree_model_pred, obs = lifestyle_test$share
 
 ```
 
+## Linear regression 2
 
+## Random forest model
 
-## Linear regression 2 
+```{r random_forest}
 
+random_forest(lifestyle_train)
+#I have not learned multiple regression etc in my statistics courses yet. I have a very general idea of what topic 3 is all about. I am doing my best though! 
+```
 
-## Random forest model 
-
-
-## Boosted tree model 
+## Boosted tree model
 
 ```{r boosted tree tuning, cache=TRUE}
 
@@ -264,9 +291,7 @@ boosted_tree_RMSE <- postResample(boosted_tree_model_pred, obs = lifestyle_test$
 
 ```
 
-
-# Comparison 
-
+# Comparison
 
 ```{r comparison of 4 models }
 ## creates a data frame of the four models RMSE on the 
@@ -287,14 +312,6 @@ paste0(" For ",
 
 ```
 
+# Automation
 
-
-
-# Automation 
-
-**not completely sure what we are supposed to do for this. I think it is from topic 2 "Automating R Markdown" where we set the parameters in the yaml and then they will be "lifestyle, bus, tech, etc" and then it will go do everything with param=lifestyle,  but let me know if you think there is a better way to do the automation. I will ask him about this 7/3. **
-
-
-
-=======
->>>>>>> de2382a4a868212034d8211f3b3cff47b0b5ab4c
+**not completely sure what we are supposed to do for this. I think it is from topic 2 "Automating R Markdown" where we set the parameters in the yaml and then they will be "lifestyle, bus, tech, etc" and then it will go do everything with param=lifestyle, but let me know if you think there is a better way to do the automation. I will ask him about this 7/3.**
