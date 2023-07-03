@@ -3,7 +3,39 @@ title: "Project 2"
 author: "Kristina Golden and Demetrios Samaras"
 date: "2023-07-02"
 output: html_document
+params: 
+      data_channel_is: 
+
 ---
+
+```{r render with params, echo=FALSE, eval=FALSE, include=FALSE}
+## delete ## working on the automation, let me know if you think there is a better way. i think for this we just have to go through at put params$ ## 
+
+## renders with parameters "lifestyle 
+rmarkdown::render("/GitHub/ST_558_Project_2", output_file = "Lifestyle.html",
+params = list(data_channel_is = "lifestyle"))
+
+## renders all 6 documents 
+
+## creates a list of all 6 desired params from create_dataframes_use_later
+X <- c("lifestyle", "entertainment", "business", "socmed", "tech", "world")
+
+## renders with params to all 
+sapply(X, FUN = function(X){
+  
+out <- paste0(X, ".html")
+  
+rmarkdown::render("/GitHub/ST_558_Project_2", output_file = out,
+params = list(data_channel_is = X ))
+  
+  
+})
+
+
+```
+
+
+
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, eval = TRUE)
@@ -61,6 +93,8 @@ colnames(online) <- c('url', 'days', 'n.Title', 'n.Content', 'Rate.Unique',
 online <- online[ , c(3:61)]
 
 #All trained data sets are in another .Rmd file called Create_dataframes_use_later. These can be copy and pasted when they are necessary
+
+## I'm not 100% sure but I think we are supposed to run this same process with the different params set up. so its like just one doc that we knit with the six different params and it goes through and does everything without us needing to copy and paste 
 ```
 
 # Write Functions
@@ -247,6 +281,12 @@ linear_1_RMSE<- postResample(boosted_tree_model_pred, obs = lifestyle_test$share
 ```
 
 ## Linear regression 2
+
+```{r Linear regression 2 }
+## delete ## I think we can just copy and paste linear regression 1 with slightly different predictors after the ~ ?  let me know what you think. ##
+
+```
+
 
 ## Random forest model
 
