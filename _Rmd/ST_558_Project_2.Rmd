@@ -119,16 +119,29 @@ g+ geom_point()
 
 ```{r random_forest}
 random_forest <- function(data_input){
-  rfFit <- randomForest(shares ~., data = data_input,
-                        mtry = ncol(data_input)/3,
-                        ntree = 200,
-                        importance = TRUE)
-  a <- as.data.frame(importance(rfFit))
-  b <- varImpPlot(rfFit)
-  out <- list(b, a)
+  set.seed(123)
+  fit_control <- trainControl(method='repeatedcv', number=3, repeats=1)
+  forest <- train(shares ~., 
+                  data = data_input, 
+                  method ='rf',
+                  ntree = 200,
+                  trControl = fit_control)
+  var_imp <- varImp(forest, scale=FALSE)$importance
+  var_imp <- data.frame(variables=row.names(var_imp), importance=var_imp$Overall)
+  a <- var_imp %>%
+        arrange(importance) %>%
+        ggplot(aes(x=reorder(variables, importance), y=importance)) + 
+        geom_bar(stat='identity') + coord_flip() + xlab('Variables') +
+        labs(title='Random forest variable importance') + 
+        theme_minimal() + 
+        theme(axis.text = element_text(size = 10), 
+              axis.title = element_text(size = 15), 
+              plot.title = element_text(size = 20))
+  b <- forest$finalModel
+  c <- forest$finalModel$importance
+  out <- list(a, b, c)
   return(out)
 }
-#Note: Need to add crossvalidation to my function
 ```
 
 # Lifestyle
