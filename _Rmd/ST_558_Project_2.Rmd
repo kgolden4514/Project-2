@@ -5,7 +5,6 @@ date: "2023-07-02"
 output: html_document
 params: 
       data_channel_is: 
-
 ---
 
 ```{r render with params, echo=FALSE, eval=FALSE, include=FALSE}
@@ -34,12 +33,9 @@ params = list(data_channel_is = X ))
 
 ```
 
-
-
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, eval = TRUE)
-setwd("~/GitHub/ST_558_Project_2")
+setwd("C:/Documents/Github/ST_558_Project_2")
 options(scipen = 1, digits = 6)
 ```
 
@@ -63,6 +59,10 @@ library(class)
 library(bst)
 library(reshape)
 library(reshape2)
+library(corrr)
+library(ggcorrplot)
+library(FactoMineR)
+library(factoextra)
 ```
 
 ## Introduction
@@ -72,7 +72,7 @@ library(reshape2)
 ## Read in the Data
 
 ```{r data, echo=FALSE, message=FALSE, warning=FALSE}
-setwd("~/GitHub/ST_558_Project_2")
+setwd("C:/Documents/Github/ST_558_Project_2")
 online <- read.csv('OnlineNewsPopularity.csv')
 colnames(online) <- c('url', 'days', 'n.Title', 'n.Content', 'Rate.Unique', 
                       'Rate.Nonstop', 'Rate.Unique.Nonstop', 'n.Links', 
@@ -146,36 +146,6 @@ g <-ggplot(lifestyle_train,  aes(y=shares, x= num_imgs))
 
 g+ geom_point()
 
-
-
-
-```
-
-```{r random_forest}
-random_forest <- function(data_input){
-  set.seed(123)
-  fit_control <- trainControl(method='repeatedcv', number=3, repeats=1)
-  forest <- train(shares ~., 
-                  data = data_input, 
-                  method ='rf',
-                  ntree = 200,
-                  trControl = fit_control)
-  var_imp <- varImp(forest, scale=FALSE)$importance
-  var_imp <- data.frame(variables=row.names(var_imp), importance=var_imp$Overall)
-  a <- var_imp %>%
-        arrange(importance) %>%
-        ggplot(aes(x=reorder(variables, importance), y=importance)) + 
-        geom_bar(stat='identity') + coord_flip() + xlab('Variables') +
-        labs(title='Random forest variable importance') + 
-        theme_minimal() + 
-        theme(axis.text = element_text(size = 10), 
-              axis.title = element_text(size = 15), 
-              plot.title = element_text(size = 20))
-  b <- forest$finalModel
-  c <- forest$finalModel$importance
-  out <- list(a, b, c)
-  return(out)
-}
 ```
 
 # Lifestyle
@@ -227,7 +197,6 @@ correlation_table(lifestyle_train)
 correlation_graph(lifestyle_train)
 ```
 
-
 ```{r correlations between shares and other variables }
 ## delete## exploratory to try to figure out which variables to include in models cause weird results. might need to prescreen and pick less variables for modeling  ## 
 
@@ -237,40 +206,6 @@ cor(entertainment_train)[1,] %>% sort()
 cor(lifestyle_train)[1,] %>% sort()
 
 
-```
-
-
-# Entertainment
-
-## Entertainment EDA
-
-```{r entertainment}
-#Create data_channel_is_lifestyle dataset
-#Take out all data_Channel_is columns that are not relevant to this data set
-entertainment <- online[ , -c(12, 14:17)]
-
-#Filter out the zeros from the remaining data_channel_is column
-entertainment <- entertainment %>%
-                 filter(Entertainment == 1)
-
-#Drop the data_channel_is column
-entertainment <- entertainment[ , -c(12)]
-entertainment <- entertainment[ , c(53, 1:52)]
-```
-
-```{r entertainment_train_test}
-#Split the data into training and test
-set.seed(5432)
-
-# Split the data into a training and test set (70/30 split)
-# indices
-
-train <- sample(1:nrow(entertainment), size = nrow(entertainment)*.70)
-test <- setdiff(1:nrow(entertainment), train)
-
-# trainiing and testing subsets
-entertainment_train <- entertainment[train, ]
-entertainment_test <- entertainment[test, ]
 ```
 
 # Modeling
@@ -300,13 +235,36 @@ linear_1_RMSE<- postResample(linear_model_1_pred, obs = entertainment_test$share
 
 ```
 
-
 ## Random forest model
 
 ```{r random_forest}
+#Cross validation not needed on random forest
+set.seed(10210526)
+#Removed rate.nonstop because they were all 1. Removed Mon-Sat and Weekend because they were binary/categorical
+lifestyle_train2 <- lifestyle_train %>%
+                      select(-c('Rate.Nonstop',
+                                'Mon', 'Tues',
+                                'Wed', 'Thurs',
+                                'Fri', 'Sat',
+                                'Sun', 
+                                'Weekend'))
+rfFit <- randomForest(shares ~ ., data = lifestyle_train2, 
+                      mtry = ncol(lifestyle_train2)/3,
+                      ntree = 200, importance = TRUE)
+rfFit
+e <- as.data.frame(rfFit$importance)
+e
+e <- e %>%
+      select(c('%IncMSE'))
+max(e)
 
-random_forest(lifestyle_train)
-#I have not learned multiple regression etc in my statistics courses yet. I have a very general idea of what topic 3 is all about. I am doing my best though! 
+varImpPlot(rfFit,scale=TRUE, var = 20)
+rfPred <- predict(rfFit, newdata =
+                    dplyr::select(lifestyle_test, -shares))
+rfRMSE <- sqrt(mean((rfPred-lifestyle_test$shares)^2))
+rfRMSE
+#Please look over this. What do you think? There are far too many variables, but I am not sure which ones to get rid of that I haven't already.
+
 ```
 
 ## Boosted tree model
