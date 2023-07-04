@@ -1,0 +1,122 @@
+---
+title: "Automation_test"
+author: "Kristina Golden and Demetrios Samaras"
+date: "2023-07-04"
+output: html_document
+params: 
+  DataChannel: "Lifestyle"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval = TRUE, message = FALSE)
+```
+
+## doing this so i dont break everything trying to get the automation to work## 
+
+```{r render with params, echo=FALSE, eval=FALSE, include=FALSE}
+
+
+## renders single github doc with parameters lifestyle 
+#rmarkdown::render("/GitHub/ST_558_Project_2/_Rmd/Automation_test.Rmd", output_file = "Lifestyle.md",
+#params = list(data_channel_is = "Lifestyle"))
+
+## renders all 6 documents 
+
+## creates a list of all 6 desired params from online
+data_channel_is <- c("Lifestyle", "Entertainment", "Business", "Social.Media", "Tech", "World")
+
+output_file <- paste0(data_channel_is, ".html")
+#create a list for each team with just the team name parameter
+params = lapply(data_channel_is, FUN = function(x){list(DataChannel = x)})
+#put into a data frame
+reports <- tibble(output_file, params)
+
+## renders with params to all 
+apply(reports, MARGIN=1, FUN = function(x){
+  
+rmarkdown::render("./_Rmd/Automation_test.Rmd", output_dir = "./automations_test_html", output_file = x[[1]], params = x[[2]]
+    )
+  }
+)
+```
+
+
+```{r test output, eval=TRUE}
+
+params$DataChannel
+
+
+```
+
+
+
+```{r brings in online data, eval=FALSE}
+
+online <- read.csv('OnlineNewsPopularity.csv')
+colnames(online) <- c('url', 'days', 'n.Title', 'n.Content', 'Rate.Unique', 
+                      'Rate.Nonstop', 'Rate.Unique.Nonstop', 'n.Links', 
+                      'n.Other', 'n.Images', 'n.Videos',
+                      'Avg.Words', 'n.Key', 'Lifestyle', 'Entertainment',
+                      'Business', 'Social.Media', 'Tech', 'World', 'Min.Worst.Key',
+                      'Max.Worst.Key', 'Avg.Worst.Key', 'Min.Best.Key', 
+                      'Max.Best.Key', 'Avg.Best.Key', 'Avg.Min.Key', 'Avg.Max.Key',
+                      'Avg.Avg.Key', 'Min.Ref', 'Max.Ref', 'Avg.Ref', 'Mon', 
+                      'Tues', 'Wed', 'Thurs', 'Fri', 'Sat', 'Sun', 'Weekend',
+                      'LDA_00', 'LDA_01', 'LDA_02', 'LDA_03', 'LDA_04', 
+                      'Global.Subj', 'Global.Pol', 'Global.Pos.Rate',
+                      'Global.Neg.Rate', 'Rate.Pos', 'Rate.Neg', 'Avg.Pos.Pol',
+                      'Min.Pos.Pol', 'Max.Pos.Pol', 'Avg.Neg.Pol', 'Min.Neg.Pol',
+                      'Max.Neg.Pol', 'Title.Subj', 'Title.Pol', 'Abs.Subj',
+                      'Abs.Pol', 'shares')
+#Dropped url and timedelta because they are non-predictive. 
+online <- online[ , c(3:61)]
+
+
+```
+
+
+```{r data_channel_is params }
+
+
+# I think if we filter first by the parameter we can get all the rows we want and then delete all the data_channel_is columns after 
+
+
+## filters rows based on when parameter is 1 
+data_channel <-  online %>% filter( !!rlang::sym(params$DataChannel) == 1)
+
+
+
+#data_channel <- online[ , -c(13:17)] 
+
+
+
+
+#Drop the data_channel_is column
+#data_channel <- data_channel[ , -c(12)] 
+#data_channel <- data_channel[ , c(53, 1:52)]
+
+
+## testing that it works properly should see all 0s for every data channel other than the parameter and 1s for the parameter. finally got it working!!! can see outputs in automations_test_html 
+
+data_channel$Lifestyle
+
+data_channel$Tech
+
+data_channel$Entertainment
+
+data_channel$Social.Media
+
+data_channel$Business
+
+data_channel$World
+
+
+
+
+
+```
+
+
+
+
+
