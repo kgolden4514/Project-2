@@ -4,33 +4,28 @@ author: "Kristina Golden and Demetrios Samaras"
 date: "2023-07-02"
 output: html_document
 params: 
-      data_channel_is: 
+  DataChannel: "Lifestyle"
 ---
 
 ```{r render with params, echo=FALSE, eval=FALSE, include=FALSE}
-## delete ## working on the automation, let me know if you think there is a better way. i think for this we just have to go through at put params$ ## 
-
-## renders single github doc with parameters lifestyle 
-rmarkdown::render("/GitHub/ST_558_Project_2", output_file = "Lifestyle.md",
-params = list(data_channel_is = "Lifestyle"))
-
-## renders all 6 documents 
+## delete ## got the automation to work, onve we have everything else good to go i will go through and adapt the code for it. we just need to use  params$DataChannel. see the automation_test for more details ## 
 
 ## creates a list of all 6 desired params from online
-X <- c("Lifestyle", "Entertainment", "Business", "Social.Media", "Tech", "World")
+data_channel_is <- c("Lifestyle", "Entertainment", "Business", "Social.Media", "Tech", "World")
+
+output_file <- paste0(data_channel_is, ".html")
+#create a list for each team with just the team name parameter
+params = lapply(data_channel_is, FUN = function(x){list(DataChannel = x)})
+#put into a data frame
+reports <- tibble(output_file, params)
 
 ## renders with params to all 
-apply(X, FUN = function(X){
+apply(reports, MARGIN=1, FUN = function(x){
   
-out <- paste0(X, ".md")
-  
-rmarkdown::render("/GitHub/ST_558_Project_2", output_file = out,
-params = list(data_channel_is = X ))
-  
-  
-})
-
-
+rmarkdown::render("./_Rmd/Automation_test.Rmd", output_dir = "./automations_test_html", output_file = x[[1]], params = x[[2]]
+    )
+  }
+)
 ```
 
 ```{r setup, include=FALSE}
@@ -232,6 +227,8 @@ linear_1_RMSE<- postResample(linear_model_1_pred, obs = lifestyle_test$shares)
 ## Linear regression 2
 
 ```{r Linear regression 2 }
+## Delete ## i think this looks good! smart things to cut out, i will try to improve mine. ## 
+
 #Removed rate.Nonstop because it was only 1 and removed the days of the week.
 linear_model_2 <- train( shares ~. - Rate.Nonstop - Mon
                          - Tues - Wed - Thurs - Fri - Sat
@@ -281,6 +278,8 @@ rfRMSE <- sqrt(mean((rfPred-lifestyle_test$shares)^2))
 rfRMSE
 #Please look over this. What do you think? There are far too many variables, but I am not sure which ones to get rid of that I haven't already.
 
+## Delete## i think it looks good! i will need to rewatch the lecture and try to dig in some more cause im really lost on these ensamble tree based models. i think you chose some good ones to remove.  the only thing is in the project it says "Both models should be chosen using cross-validation" for random forest and boosted tree, so i think the random forest does need cv unless im missing something. Im still trying to figure out what is wrong with my cross validation and a way to take the tuning parameters based on each data_channel_is during the automation process. I think we are close though! 
+
 ```
 
 ## Boosted tree model
@@ -304,7 +303,7 @@ fit_control <- trainControl(method = "repeatedcv",
 set.seed(13)
 
 ## trains to find optimal tuning parameters except it is giving weird parameters 
-gbm_tree_cv <- train(shares ~ ., data = entertainment_train,
+gbm_tree_cv <- train(shares ~ ., data = lifestyle_train,
                      method = "gbm",
                      preProcess = c("center", "scale"),
                      trControl = fit_control,
@@ -317,17 +316,17 @@ plot(gbm_tree_cv)
 
 ```{r boosted tree tuned}
 ## creates boosted tree model with tuning parameters n.trees, shrinkage, interaction.depth from CV 
-boosted_tree_model <- gbm(shares ~ ., data = entertainment_train, 
+boosted_tree_model <- gbm(shares ~ ., data = lifestyle_train, 
                           distribution = "gaussian", 
                           n.trees = 16 ,
                           shrinkage = 0.1 , 
                           interaction.depth = 7 )
 
 ## test set prediction
-boosted_tree_model_pred <- predict(boosted_tree_model, newdata = dplyr::select(entertainment_test, -shares), n.trees = 7)
+boosted_tree_model_pred <- predict(boosted_tree_model, newdata = dplyr::select(lifestyle_test, -shares), n.trees = 7)
 
 ## stores results 
-boosted_tree_RMSE <- postResample(boosted_tree_model_pred, obs = entertainment_test$shares)
+boosted_tree_RMSE <- postResample(boosted_tree_model_pred, obs = lifestyle_test$shares)
 
 ```
 
@@ -336,9 +335,8 @@ boosted_tree_RMSE <- postResample(boosted_tree_model_pred, obs = entertainment_t
 ```{r comparison of 4 models }
 ## creates a data frame of the four models RMSE on the 
 models_RMSE <- data.frame(linear_1_RMSE=linear_1_RMSE[1],
-                        ## delete after ## I can take care of these other two if you want since you did so much of the data stuff just let me know ##
-                         #linear_2_RMSE=linear_2_RMSE[1], 
-                         #random_forest_RMSE=random_forest_RMSE[1]
+                         linear_2_RMSE=linear_2_RMSE[1], 
+                         rfRMSE=rfRMSE[1],
                           boosted_tree_RMSE = boosted_tree_RMSE[1] )
 
 ## gets the name of the column with the smallest rmse 
@@ -346,8 +344,7 @@ smallest_RMSE<-colnames(models_RMSE)[apply(models_RMSE,1,which.min)]
 
 ## declares the model with smallest RSME the winner 
 paste0(" For ", 
-       ## parameter will be lifestyle for this one I think
-       #parameter, 
+       ## params$DataChannel, 
        smallest_RMSE, " is the winner")
 
 ```
