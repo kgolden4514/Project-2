@@ -214,24 +214,40 @@ cor(lifestyle_train)[1,] %>% sort()
 
 ```{r Linear regression 1 }
 ## linear regression model using all predictors 
-linear_model_1 <- train( shares ~ ., data = entertainment_train,
+linear_model_1 <- train( shares ~ ., 
+                         data = lifestyle_train,
                          method = "lm",
                          preProcess = c("center", "scale"),
                          trControl = trainControl(method = "cv", 
                                                   number = 5))
 
 ## prediction of test with model 
-linear_model_1_pred <- predict(linear_model_1, newdata = dplyr::select(entertainment_test, -shares))
+linear_model_1_pred <- predict(linear_model_1, newdata = dplyr::select(lifestyle_test, -shares))
 
 ## storing error of model on test set 
-linear_1_RMSE<- postResample(linear_model_1_pred, obs = entertainment_test$shares)
+linear_1_RMSE<- postResample(linear_model_1_pred, obs = lifestyle_test$shares)
 
 ```
 
 ## Linear regression 2
 
 ```{r Linear regression 2 }
-## delete ## I think we can just copy and paste linear regression 1 with slightly different predictors after the ~ ?  let me know what you think. ##
+#Removed rate.Nonstop because it was only 1 and removed the days of the week.
+linear_model_2 <- train( shares ~. - Rate.Nonstop - Mon
+                         - Tues - Wed - Thurs - Fri - Sat
+                         - Sun - Weekend, 
+                        data = lifestyle_train,
+                         method = "lm",
+                         preProcess = c("center", 
+                                        "scale"),
+                         trControl = trainControl(
+                           method= "cv", 
+                           number = 5))
+## prediction of test with model 
+linear_model_2_pred <- predict(linear_model_2, newdata = dplyr::select(lifestyle_test, -shares))
+
+## storing error of model on test set 
+linear_2_RMSE<- postResample(linear_model_2_pred, obs = lifestyle_test$shares)
 
 ```
 
