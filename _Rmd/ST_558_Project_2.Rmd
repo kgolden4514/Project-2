@@ -28,9 +28,18 @@ rmarkdown::render('C:/Documents/Github/ST_558_Project_2/_Rmd/Automation_test.Rmd
 )
 
 ##Delete## Ok, besides written commentary, I think everything else is good to go (unless we decide we want to add some scatterplots, but there are so many possible prediction variables, that scatterplots seem overwhelming). What do I need to do to assist with the automation portion? I am happy to assist, though I do find this portion extremely confusing. I really appreciate you taking that part of the project on! Let me know if there is anything you would like me to modify on my portions of the regression/EDA
+
+## Delete## Yep I think the last thing we have to do is the written commentary and then the summarzations portion where we each have to generate summary stats like means contingency tables and three graphs each. i think the automation portion should be pretty straight forward from here since you already did everything to sort the data we basically just have to use the object from this 
+`data_channel <-  online %>% filter( !!rlang::sym(params$DataChannel)== 1)`
+# which fills data_channel with all the rows that have a 1 for that parameter.  so rather than using lifestyle_train etc it will be data_channel_train and then each report will generate from each data channel but it will go through and do all the graphs and stuff with the data from that. the default in the yaml is lifestyle so if you want to look at a differnt data set while we are still working on this document you can change it to like "Tech" to make sure the code works but its finicky so check it with params$DataChannel, I have to knit to get it to update the params$DataChannel . but when we run the render it will generate all 6. we also need to change it to github document and .md for the final product. 
+
+# If you are still confused about the automation please let me know and i will try to a better job explaining what is going on. it definitely took me a bit to figure out how it works.  
+
 ```
 
-```{r setup, include=FALSE}
+```{r setup, eval= FALSE, include=FALSE}
+
+## DELETE## changed this to eval = FALSE so it would knit on my machine please feel free to change back if i forget
 knitr::opts_chunk$set(echo = TRUE, eval = TRUE, 
                       cache = TRUE)
 setwd("C:/Documents/Github/ST_558_Project_2")
@@ -65,12 +74,16 @@ library(factoextra)
 
 ## Introduction
 
-**this is just a placeholder for now, will do better when I have a better understanding of what is going on**
+In this report we will be looking at the `r params$DataChannel` data channel of the online news popularity data set. This data set looks at a wide range of variables from 39644 different news articles. The response variable that we will be focusing on is **shares**. The purpose of this analysis is to try to predict how many shares a `r params$DataChannel` article will get based on the values of those other variables. We will be modeling shares using two different linear regression models and two ensemble tree based models. 
+
 
 ## Read in the Data
 
-```{r data, echo=FALSE, message=FALSE, warning=FALSE}
-setwd("C:/Documents/Github/ST_558_Project_2")
+```{r data, echo=FALSE, message=FALSE, warning=FALSE, eval=TRUE}
+## DELETE## changed this so it would knit on my machine feel free to change it back if I forget to
+
+#setwd("C:/Documents/Github/ST_558_Project_2")
+setwd("C:/Users/Demetri/Documents/NCSU_masters/ST558/Repos/GitHub/ST_558_Project_2")
 online <- read.csv('OnlineNewsPopularity.csv')
 colnames(online) <- c('url', 'days', 'n.Title', 'n.Content', 'Rate.Unique', 
                       'Rate.Nonstop', 'Rate.Unique.Nonstop', 'n.Links', 
@@ -95,7 +108,7 @@ online <- online[ , c(3:61)]
 ## I'm not 100% sure but I think we are supposed to run this same process with the different params set up. so its like just one doc that we knit with the six different params and it goes through and does everything without us needing to copy and paste 
 ```
 
-# Write Functions
+## Write Functions
 
 ```{r summary_table}
 #Creates Summary Tables for a training dataset
@@ -146,9 +159,41 @@ g+ geom_point()
 
 ```
 
-# Lifestyle
+## `r params$DataChannel` 
 
-## Lifestyle EDA
+### `r params$DataChannel` EDA
+
+```{r automation creation of each data set, message=FALSE }
+
+## filters rows based on when parameter is 1 
+data_channel <-  online %>% filter( !!rlang::sym(params$DataChannel) == 1)
+
+## Drop the data_channel_is columns 
+data_channel <- data_channel[ , -c(12:17)]
+
+## reorder to put shares first 
+data_channel <- data_channel[ , c(53, 1:52)]
+
+```
+
+```{r automation train and test }
+
+set.seed(5432)
+
+# Split the data into a training and test set (70/30 split)
+# indices
+
+train <- sample(1:nrow(data_channel), size = nrow(data_channel)*.70)
+test <- setdiff(1:nrow(data_channel), train)
+
+# training and testing subsets
+data_channel_train <- data_channel[train, ]
+data_channel_test <- data_channel[test, ]
+
+
+```
+
+
 
 ```{r Lifestyle}
 #Create data_channel_is_lifestyle dataset
@@ -180,6 +225,8 @@ lifestyle_train <- lifestyle[train, ]
 lifestyle_test <- lifestyle[test, ]
 ```
 
+## `r params$DataChannel` Summarizations 
+
 ```{r lifestyle_summary}
 #Shares table for lifestyle_train
 summary_table(lifestyle_train)
@@ -195,39 +242,52 @@ correlation_table(lifestyle_train)
 correlation_graph(lifestyle_train)
 ```
 
-```{r correlations between shares and other variables }
-## delete## exploratory to try to figure out which variables to include in models cause weird results. might need to prescreen and pick less variables for modeling  ## 
-
-cor(entertainment_train)[1,] %>% sort()
 
 
-cor(lifestyle_train)[1,] %>% sort()
+```{r correlations between shares and other variables, eval=TRUE }
+## makes least to most correlated 
+shares_correlations <- cor(data_channel_train)[1,] %>% sort() 
 
+shares_correlations
 
 ```
 
-# Modeling
+```{r graph of shares with highest correlated var}
+## take the name of the highest correlated variable
+highest_cor <-shares_correlations[52]  %>% names()
 
-## Linear regression 1
+## creats scatter plot looking at shares vs highest correlated variable
+g <-ggplot(data_channel_train,  aes(y=shares, x= data_channel_train[[highest_cor]]))
+
+g+ geom_point()
+
+```
+
+
+
+
+## Modeling
+
+### Linear regression 1
 
 ```{r Linear regression 1 }
 ## linear regression model using all predictors 
 linear_model_1 <- train( shares ~ ., 
-                         data = lifestyle_train,
+                         data = data_channel_train,
                          method = "lm",
                          preProcess = c("center", "scale"),
                          trControl = trainControl(method = "cv", 
                                                   number = 5))
 
 ## prediction of test with model 
-linear_model_1_pred <- predict(linear_model_1, newdata = dplyr::select(lifestyle_test, -shares))
+linear_model_1_pred <- predict(linear_model_1, newdata = dplyr::select(data_channel_test, -shares))
 
 ## storing error of model on test set 
-linear_1_RMSE<- postResample(linear_model_1_pred, obs = lifestyle_test$shares)
+linear_1_RMSE<- postResample(linear_model_1_pred, obs = data_channel_test$shares)
 
 ```
 
-## Linear regression 2
+### Linear regression 2
 
 ```{r Linear regression 2 }
 ## Delete ## i think this looks good! smart things to cut out, i will try to improve mine. ## 
@@ -251,7 +311,7 @@ linear_2_RMSE<- postResample(linear_model_2_pred, obs = lifestyle_test$shares)
 
 ```
 
-## Random forest model
+### Random forest model
 
 ```{r random_forest, cache=TRUE}
 set.seed(10210526)
@@ -273,7 +333,7 @@ rfRMSE<- postResample(rfFit_pred, obs =
 
 ```
 
-## Boosted tree model
+### Boosted tree model
 
 ```{r boosted tree tuning, cache=TRUE}
 
@@ -282,7 +342,7 @@ rfRMSE<- postResample(rfFit_pred, obs =
 
 ## creates grid of possible tuning parameters 
 gbm_grid <-  expand.grid(interaction.depth = c(1,4,7), 
-  n.trees = c(1:20)*10 , 
+  n.trees = c(1:20) , 
   shrinkage = 0.1,
   n.minobsinnode = c(20, 40))
 
@@ -294,7 +354,7 @@ fit_control <- trainControl(method = "repeatedcv",
 set.seed(13)
 
 ## trains to find optimal tuning parameters except it is giving weird parameters 
-gbm_tree_cv <- train(shares ~ ., data = lifestyle_train,
+gbm_tree_cv <- train(shares ~ ., data = data_channel_train,
                      method = "gbm",
                      preProcess = c("center", "scale"),
                      trControl = fit_control,
@@ -307,21 +367,21 @@ plot(gbm_tree_cv)
 
 ```{r boosted tree tuned}
 ## creates boosted tree model with tuning parameters n.trees, shrinkage, interaction.depth from CV 
-boosted_tree_model <- gbm(shares ~ ., data = lifestyle_train, 
+boosted_tree_model <- gbm(shares ~ ., data = data_channel_train, 
                           distribution = "gaussian", 
                           n.trees = 16 ,
                           shrinkage = 0.1 , 
                           interaction.depth = 7 )
 
 ## test set prediction
-boosted_tree_model_pred <- predict(boosted_tree_model, newdata = dplyr::select(lifestyle_test, -shares), n.trees = 7)
+boosted_tree_model_pred <- predict(boosted_tree_model, newdata = dplyr::select(data_channel_test, -shares), n.trees = 7)
 
 ## stores results 
-boosted_tree_RMSE <- postResample(boosted_tree_model_pred, obs = lifestyle_test$shares)
+boosted_tree_RMSE <- postResample(boosted_tree_model_pred, obs = data_channel_test$shares)
 
 ```
 
-# Comparison
+## Comparison
 
 ```{r comparison of 4 models }
 ## creates a data frame of the four models RMSE on the 
@@ -336,11 +396,37 @@ smallest_RMSE<-colnames(models_RMSE)[apply(models_RMSE,1,which.min)]
 
 ## declares the model with smallest RSME the winner 
 paste0(" For ", 
-       ## params$DataChannel, 
+        params$DataChannel, " ", 
        smallest_RMSE, " is the winner")
 
 ```
 
-# Automation
+## Automation 
 
-**not completely sure what we are supposed to do for this. I think it is from topic 2 "Automating R Markdown" where we set the parameters in the yaml and then they will be "lifestyle, bus, tech, etc" and then it will go do everything with param=lifestyle, but let me know if you think there is a better way to do the automation. I will ask him about this 7/3.**
+This is the code used to automate the rendering of each document based on the parameter designated in the YAML. 
+
+```{r render with params code, echo=TRUE, eval=FALSE}
+
+## creates a list of all 6 desired params from online
+data_channel_is <- c("Lifestyle", "Entertainment", "Business", "Social.Media", "Tech", "World")
+
+## creates the output file name 
+output_file <- paste0(data_channel_is, ".md")
+
+#create a list for each channel with just the channel name parameter
+params = lapply(data_channel_is, FUN = function(x){list(DataChannel = x)})
+
+#put into a data frame
+reports <- tibble(output_file, params)
+
+## renders with params to all 
+apply(reports, MARGIN=1, FUN = function(x){
+  
+rmarkdown::render('C:/Documents/Github/ST_558_Project_2/_Rmd/Automation_test.Rmd', output_dir = "./automations_test_html", output_file = x[[1]], params = x[[2]]
+    )
+  }
+)
+
+```
+
+
