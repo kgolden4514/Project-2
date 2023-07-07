@@ -150,14 +150,7 @@ correlation_graph <- function(data_input,sig=0.5){
 # scatterplots(lifestyle_train)
 ```
 
-```{r scaterplots testing, include=FALSE, echo=FALSE, eval=FALSE}
-## delete ## just looking at the way scatter plots look 
 
-g <-ggplot(lifestyle_train,  aes(y=shares, x= num_imgs))
-
-g+ geom_point()
-
-```
 
 ## `r params$DataChannel` 
 
@@ -245,7 +238,7 @@ correlation_graph(lifestyle_train)
 
 
 ```{r correlations between shares and other variables, eval=TRUE }
-## makes least to most correlated 
+## makes least to most of the correlation of every variable with shares 
 shares_correlations <- cor(data_channel_train)[1,] %>% sort() 
 
 shares_correlations
@@ -257,11 +250,24 @@ shares_correlations
 highest_cor <-shares_correlations[52]  %>% names()
 
 ## creats scatter plot looking at shares vs highest correlated variable
-g <-ggplot(data_channel_train,  aes(y=shares, x= data_channel_train[[highest_cor]]))
+g <-ggplot(data_channel_train,  aes(y=shares, x= data_channel_train[[highest_cor]])) 
 
-g+ geom_point()
+g+ geom_point() + labs + ggtitle(" Highest correlated variable with shares")
 
 ```
+
+```{r cpntogency table }
+#at least 2 factors 
+#shares exceeded median and wether program was on the weekend 
+#wether or not it was the weekend 
+# cut() 
+#online %>% select(shares) %>% mutate (shareshigh> mean shares)
+
+#is weekend shares high %>% table prop table relative freq
+
+# prop.table(margin= "isweekend")
+```
+
 
 
 
@@ -272,6 +278,8 @@ g+ geom_point()
 
 ```{r Linear regression 1 }
 ## linear regression model using all predictors 
+set.seed(13)
+
 linear_model_1 <- train( shares ~ ., 
                          data = data_channel_train,
                          method = "lm",
@@ -331,6 +339,8 @@ rfRMSE<- postResample(rfFit_pred, obs =
 
 ## Delete## I rewatched the lecture for model fitting using the caret package. I made the appropriate modifications. I tried to use the tuneGrid but the code was trying to run for over 5 minutes and it never went through, so I used the suggested mtry for regression from the random forest lecture.
 
+## delete## So i went through the random forrest stuff again while doing the hw that was due today and my random forrest also took forever to run with the tune grid. i think it just depends on the size of the expand.grid that you give it. we should keep that in mind for when we are doing the final render of the project because it may take forever to render all 6 lol
+
 ```
 
 ### Boosted tree model
@@ -344,7 +354,7 @@ rfRMSE<- postResample(rfFit_pred, obs =
 gbm_grid <-  expand.grid(interaction.depth = c(1,4,7), 
   n.trees = c(1:20) , 
   shrinkage = 0.1,
-  n.minobsinnode = c(20, 40))
+  n.minobsinnode = c(10,20, 40))
 
 ## sets trainControl method 
 fit_control <- trainControl(method = "repeatedcv",
@@ -354,7 +364,7 @@ fit_control <- trainControl(method = "repeatedcv",
 set.seed(13)
 
 ## trains to find optimal tuning parameters except it is giving weird parameters 
-gbm_tree_cv <- train(shares ~ ., data = data_channel_train,
+gbm_tree_cv <- train(shares ~ . , data = data_channel_train,
                      method = "gbm",
                      preProcess = c("center", "scale"),
                      trControl = fit_control,
@@ -363,23 +373,14 @@ gbm_tree_cv <- train(shares ~ ., data = data_channel_train,
 ## plot to visualize parameters 
 plot(gbm_tree_cv)
 
-```
-
-```{r boosted tree tuned}
-## creates boosted tree model with tuning parameters n.trees, shrinkage, interaction.depth from CV 
-boosted_tree_model <- gbm(shares ~ ., data = data_channel_train, 
-                          distribution = "gaussian", 
-                          n.trees = 16 ,
-                          shrinkage = 0.1 , 
-                          interaction.depth = 7 )
-
 ## test set prediction
-boosted_tree_model_pred <- predict(boosted_tree_model, newdata = dplyr::select(data_channel_test, -shares), n.trees = 7)
+boosted_tree_model_pred <- predict(gbm_tree_cv, newdata = dplyr::select(data_channel_test, -shares), n.trees = 7)
 
 ## stores results 
 boosted_tree_RMSE <- postResample(boosted_tree_model_pred, obs = data_channel_test$shares)
 
 ```
+
 
 ## Comparison
 
