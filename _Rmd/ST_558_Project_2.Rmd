@@ -4,10 +4,10 @@ author: "Kristina Golden and Demetrios Samaras"
 date: "2023-07-02"
 output: html_document
 params: 
-  DataChannel: "Lifestyle"
+  DataChannel: "Tech"
 ---
 
-```{r render with params, echo=FALSE, eval=FALSE, include=FALSE}
+```{r render with params, eval=FALSE, include=FALSE}
 ## delete ## got the automation to work, onve we have everything else good to go i will go through and adapt the code for it. we just need to use  params$DataChannel. see the automation_test for more details ## 
 
 ## creates a list of all 6 desired params from online
@@ -35,20 +35,24 @@ rmarkdown::render('C:/Documents/Github/ST_558_Project_2/_Rmd/Automation_test.Rmd
 
 # If you are still confused about the automation please let me know and i will try to a better job explaining what is going on. it definitely took me a bit to figure out how it works.  
 
+##Delete## So, I changed all necessary inputs to data_channel_train and data_channel_test. I can change the default YAML and see that it does create do everything for the data channel specified in the YAML. That's awesome! But, it is running all 6 data channels at once? If that is the case, where are the htmls going for each data channel? I see the folder with htmls in it, but the htmls have a bunch of 0s and 1s. 
+##
+##About the written commentary, are we supposed to provide that for every data_channel? If so, how are we automating that? We still need to add the factor contingency graphs. Do we want to set a binary to shares like we did for the HW8 for rented bike count? If so, what is your suggestion? I do not mind making the tables for that. As far as the blog post goes, I do not mind writing it. I do have trouble with github in the following ways 1.) Even though I use and .md file, getting my output images to show up in my blog posts, 2.) I do not know how to set a visually appealing theme.
 ```
 
-```{r setup, eval= FALSE, include=FALSE}
+```{r setup}
 
 ## DELETE## changed this to eval = FALSE so it would knit on my machine please feel free to change back if i forget
-knitr::opts_chunk$set(echo = TRUE, eval = TRUE, 
-                      cache = TRUE)
+knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
 setwd("C:/Documents/Github/ST_558_Project_2")
 options(scipen = 1, digits = 6)
 ```
 
+# `r params$DataChannel`
+
 ## Required Packages
 
-```{r packages, message=FALSE, warning=FALSE}
+```{r packages, echo=TRUE, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(knitr)
 library(GGally)
@@ -70,20 +74,22 @@ library(corrr)
 library(ggcorrplot)
 library(FactoMineR)
 library(factoextra)
+library(data.table)
 ```
 
 ## Introduction
 
-In this report we will be looking at the `r params$DataChannel` data channel of the online news popularity data set. This data set looks at a wide range of variables from 39644 different news articles. The response variable that we will be focusing on is **shares**. The purpose of this analysis is to try to predict how many shares a `r params$DataChannel` article will get based on the values of those other variables. We will be modeling shares using two different linear regression models and two ensemble tree based models. 
-
+In this report we will be looking at the `r params$DataChannel` data channel of the online news popularity data set. This data set looks at a wide range of variables from 39644 different news articles. The response variable that we will be focusing on is **shares**. The purpose of this analysis is to try to predict how many shares a `r params$DataChannel` article will get based on the values of those other variables. We will be modeling shares using two different linear regression models and two ensemble tree based models.
 
 ## Read in the Data
 
-```{r data, echo=FALSE, message=FALSE, warning=FALSE, eval=TRUE}
+```{r data, echo=TRUE, message=FALSE, warning=FALSE}
 ## DELETE## changed this so it would knit on my machine feel free to change it back if I forget to
 
-#setwd("C:/Documents/Github/ST_558_Project_2")
-setwd("C:/Users/Demetri/Documents/NCSU_masters/ST558/Repos/GitHub/ST_558_Project_2")
+setwd("C:/Documents/Github/ST_558_Project_2")
+# setwd("C:/Users/Demetri/Documents/NCSU_masters/ST558/Repos/GitHub/ST_558_Project_2")
+##Delete## I learned this trick while working my summer internship. When you are collaborating with people, put your project in your documents in a folder named Github. Everyone collaborating does the same. Then we have the same working directory. I just commented your working directory out so it would run the code for me, while you're working, fill free to comment mine out and uncomment yours.
+
 online <- read.csv('OnlineNewsPopularity.csv')
 colnames(online) <- c('url', 'days', 'n.Title', 'n.Content', 'Rate.Unique', 
                       'Rate.Nonstop', 'Rate.Unique.Nonstop', 'n.Links', 
@@ -111,20 +117,34 @@ online <- online[ , c(3:61)]
 ## Write Functions
 
 ```{r summary_table}
-#Creates Summary Tables for a training dataset
 summary_table <- function(data_input) {
-  d <- describe(data_input[ , c('shares')], fast=TRUE)
-  kable(d, caption = 'Shares Summary')
+    min <- min(data_input$shares)
+    q1 <- quantile(data_input$shares, 0.25)
+    med <- median(data_input$shares)
+    q3 <- quantile(data_input$shares, 0.75)
+    max <- max(data_input$shares)
+    mean1 <- mean(data_input$shares)
+    sd1 <- sd(data_input$shares)
+    Summary <- as.data.frame(cbind(min, q1, med, q3, max,
+                                   mean1, sd1))
+    colnames(Summary) <- c("Minimum", "Q1", "Median", "Q3",
+                           "Maximum", "Mean", "SD")
+    rownames(Summary) <- c("Shares")
+    setDT(Summary)
+    Summary
 }
+  
 ```
 
 ```{r correlation_table}
 #Create correlation table and graph for a training dataset
 correlation_table <- function(data_input) {
   #drop binary variables
-  correlations <- cor(subset(data_input, select = c(2:4, 6:24, 33:50)))
+  correlations <- cor(subset(data_input, select = c(2:4, 6:24,
+                                                    33:50)))
   kable(correlations, caption = 'Correlations Lifestyle')
 }
+
 ```
 
 ```{r correlation_graph}
@@ -150,11 +170,7 @@ correlation_graph <- function(data_input,sig=0.5){
 # scatterplots(lifestyle_train)
 ```
 
-
-
-## `r params$DataChannel` 
-
-### `r params$DataChannel` EDA
+## `r params$DataChannel` EDA
 
 ```{r automation creation of each data set, message=FALSE }
 
@@ -186,56 +202,21 @@ data_channel_test <- data_channel[test, ]
 
 ```
 
+## `r params$DataChannel` Summarizations
 
-
-```{r Lifestyle}
-#Create data_channel_is_lifestyle dataset
-#Take out all data_Channel_is columns that are not relevant to this data set
-lifestyle <- online[ , -c(13:17)] 
-
-
-#Filter out the zeros from the remaining data_channel_is column
-lifestyle <- lifestyle %>%
-             filter(Lifestyle == 1)
-
-#Drop the data_channel_is column
-lifestyle <- lifestyle[ , -c(12)] 
-lifestyle <- lifestyle[ , c(53, 1:52)]
+```{r r params$DataChannel_summary, echo=TRUE}
+summary_table(data_channel_train)
 ```
 
-```{r lifestyle_train_test}
-#Split the data into training and test
-set.seed(5432)
-
-# Split the data into a training and test set (70/30 split)
-# indices
-
-train <- sample(1:nrow(lifestyle), size = nrow(lifestyle)*.70)
-test <- setdiff(1:nrow(lifestyle), train)
-
-# trainiing and testing subsets
-lifestyle_train <- lifestyle[train, ]
-lifestyle_test <- lifestyle[test, ]
-```
-
-## `r params$DataChannel` Summarizations 
-
-```{r lifestyle_summary}
-#Shares table for lifestyle_train
-summary_table(lifestyle_train)
-```
-
-```{r lifestyle_corr_table}
+```{r params$DataChannel_corr_table}
 #Correlation table for lifestyle_train
-correlation_table(lifestyle_train)
+correlation_table(data_channel_train)
 ```
 
-```{r lifestyle_corr_graph}
+```{r r params$DataChannel corr_graph, message=FALSE, warning=FALSE}
 #Correlation graph for lifestyle_train
-correlation_graph(lifestyle_train)
+correlation_graph(data_channel_train)
 ```
-
-
 
 ```{r correlations between shares and other variables, eval=TRUE }
 ## makes least to most of the correlation of every variable with shares 
@@ -252,7 +233,7 @@ highest_cor <-shares_correlations[52]  %>% names()
 ## creats scatter plot looking at shares vs highest correlated variable
 g <-ggplot(data_channel_train,  aes(y=shares, x= data_channel_train[[highest_cor]])) 
 
-g+ geom_point() + labs + ggtitle(" Highest correlated variable with shares")
+g+ geom_point() + labs() + ggtitle(" Highest correlated variable with shares")
 
 ```
 
@@ -267,10 +248,6 @@ g+ geom_point() + labs + ggtitle(" Highest correlated variable with shares")
 
 # prop.table(margin= "isweekend")
 ```
-
-
-
-
 
 ## Modeling
 
@@ -304,7 +281,7 @@ linear_1_RMSE<- postResample(linear_model_1_pred, obs = data_channel_test$shares
 linear_model_2 <- train( shares ~. - Rate.Nonstop - Mon
                          - Tues - Wed - Thurs - Fri - Sat
                          - Sun - Weekend, 
-                        data = lifestyle_train,
+                        data = data_channel_train,
                          method = "lm",
                          preProcess = c("center", 
                                         "scale"),
@@ -312,10 +289,10 @@ linear_model_2 <- train( shares ~. - Rate.Nonstop - Mon
                            method= "cv", 
                            number = 5))
 ## prediction of test with model 
-linear_model_2_pred <- predict(linear_model_2, newdata = dplyr::select(lifestyle_test, -shares))
+linear_model_2_pred <- predict(linear_model_2, newdata = dplyr::select(data_channel_test, -shares))
 
 ## storing error of model on test set 
-linear_2_RMSE<- postResample(linear_model_2_pred, obs = lifestyle_test$shares)
+linear_2_RMSE<- postResample(linear_model_2_pred, obs = data_channel_test$shares)
 
 ```
 
@@ -324,16 +301,18 @@ linear_2_RMSE<- postResample(linear_model_2_pred, obs = lifestyle_test$shares)
 ```{r random_forest, cache=TRUE}
 set.seed(10210526)
 rfFit <- train(shares ~ ., 
-        data = lifestyle_train,
+        data = data_channel_train,
         method = "rf",
         trControl = trainControl(method = "cv",
                                         number = 5),
         preProcess = c("center", "scale"),
         tuneGrid = 
-          data.frame(mtry = ncol(lifestyle_train)/3))
-rfFit_pred <- predict(rfFit, newdata = lifestyle_test)
+          data.frame(mtry = ncol(data_channel_train)/3))
+rfFit_pred <- predict(rfFit, newdata = data_channel_test)
 rfRMSE<- postResample(rfFit_pred, obs =
-                            lifestyle_test$shares)
+                            data_channel_test$shares)
+
+##Delete## I will try again to add a tuneGrid to the random forest tomorrow later today
 
 ## Delete## i think it looks good! i will need to rewatch the lecture and try to dig in some more cause im really lost on these ensamble tree based models. i think you chose some good ones to remove.  the only thing is in the project it says "Both models should be chosen using cross-validation" for random forest and boosted tree, so i think the random forest does need cv unless im missing something. Im still trying to figure out what is wrong with my cross validation and a way to take the tuning parameters based on each data_channel_is during the automation process. I think we are close though! 
 
@@ -381,7 +360,6 @@ boosted_tree_RMSE <- postResample(boosted_tree_model_pred, obs = data_channel_te
 
 ```
 
-
 ## Comparison
 
 ```{r comparison of 4 models }
@@ -402,9 +380,9 @@ paste0(" For ",
 
 ```
 
-## Automation 
+## Automation
 
-This is the code used to automate the rendering of each document based on the parameter designated in the YAML. 
+This is the code used to automate the rendering of each document based on the parameter designated in the YAML.
 
 ```{r render with params code, echo=TRUE, eval=FALSE}
 
@@ -429,5 +407,3 @@ rmarkdown::render('C:/Documents/Github/ST_558_Project_2/_Rmd/Automation_test.Rmd
 )
 
 ```
-
-
