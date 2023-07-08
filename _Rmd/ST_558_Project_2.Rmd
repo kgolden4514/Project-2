@@ -8,7 +8,7 @@ params:
 ---
 
 ```{r render with params, eval=FALSE, include=FALSE}
-## delete ## got the automation to work, onve we have everything else good to go i will go through and adapt the code for it. we just need to use  params$DataChannel. see the automation_test for more details ## 
+## DELETE## This will also only knit htmls, we have to change the output to github_document and use the one at the bottom to get it to generate github documents  
 
 ## creates a list of all 6 desired params from online
 data_channel_is <- c("Lifestyle", "Entertainment", "Business", "Social.Media", "Tech", "World")
@@ -22,29 +22,31 @@ reports <- tibble(output_file, params)
 ## renders with params to all 
 apply(reports, MARGIN=1, FUN = function(x){
   
-rmarkdown::render('C:/Documents/Github/ST_558_Project_2/_Rmd/Automation_test.Rmd', output_dir = "./automations_test_html", output_file = x[[1]], params = x[[2]]
+rmarkdown::render("C:/Users/Demetri/Documents/NCSU_masters/ST558/Repos/GitHub/ST_558_Project_2/_Rmd/ST_558_Project_2.Rmd", output_dir = "./automations_test_html", output_file = x[[1]], params = x[[2]]
     )
   }
 )
 
-##Delete## Ok, besides written commentary, I think everything else is good to go (unless we decide we want to add some scatterplots, but there are so many possible prediction variables, that scatterplots seem overwhelming). What do I need to do to assist with the automation portion? I am happy to assist, though I do find this portion extremely confusing. I really appreciate you taking that part of the project on! Let me know if there is anything you would like me to modify on my portions of the regression/EDA
-
-## Delete## Yep I think the last thing we have to do is the written commentary and then the summarzations portion where we each have to generate summary stats like means contingency tables and three graphs each. i think the automation portion should be pretty straight forward from here since you already did everything to sort the data we basically just have to use the object from this 
-`data_channel <-  online %>% filter( !!rlang::sym(params$DataChannel)== 1)`
-# which fills data_channel with all the rows that have a 1 for that parameter.  so rather than using lifestyle_train etc it will be data_channel_train and then each report will generate from each data channel but it will go through and do all the graphs and stuff with the data from that. the default in the yaml is lifestyle so if you want to look at a differnt data set while we are still working on this document you can change it to like "Tech" to make sure the code works but its finicky so check it with params$DataChannel, I have to knit to get it to update the params$DataChannel . but when we run the render it will generate all 6. we also need to change it to github document and .md for the final product. 
-
-# If you are still confused about the automation please let me know and i will try to a better job explaining what is going on. it definitely took me a bit to figure out how it works.  
 
 ##Delete## So, I changed all necessary inputs to data_channel_train and data_channel_test. I can change the default YAML and see that it does create do everything for the data channel specified in the YAML. That's awesome! But, it is running all 6 data channels at once? If that is the case, where are the htmls going for each data channel? I see the folder with htmls in it, but the htmls have a bunch of 0s and 1s. 
-##
+
+## DELETe## so i think the issue may be you have to run the actual code chuck and then change the "c:/Users towhatever the path of this file is on your device and then the output_dir to whereever you want the 6 documents to render ( you can see all 6 rendered from running this code chunk in the automations_test folder ). but it wont work if you knit it the normal way. we will also need to make sure it is giuthub_document for the final so it shows up properly 
+
+
+
 ##About the written commentary, are we supposed to provide that for every data_channel? If so, how are we automating that? We still need to add the factor contingency graphs. Do we want to set a binary to shares like we did for the HW8 for rented bike count? If so, what is your suggestion? I do not mind making the tables for that. As far as the blog post goes, I do not mind writing it. I do have trouble with github in the following ways 1.) Even though I use and .md file, getting my output images to show up in my blog posts, 2.) I do not know how to set a visually appealing theme.
+
+## DELETE## i dont think so. so we just need to write general commentary where the project says "As you will automate this same analysis across other data, you can’t describe the trends you see in the graph (unless you want to try to automate that!)" which i honestly dont want to try to automate that lol and i dont think we get any points for that so unless you really want to automate i would just write general commentary. as far as the contigency tables and graphs i think the project says we are both supposed to make some contigency tables and three graphs, "Each group member is responsible for producing some summary statistics (means, sds, contingency tables, etc.) and for producing at least three graphs (each) of the data."  so for my contigency tables (make sure these are two way tables i asked him and he emphatically said two way tables lol) i just did shares like a factor of above or below the mean shares (called it shareshigh) and then compared it to the weekend and monday and then made a histogram and col graph and scatterplot of some differnt variables. so i would just do something along those lines with whatever variables you think are interesting.  i think we also both have to write out own blog post but like i will use the links to your repo and pages, we dont have to put the actual docs in the blog ( they will be in the repo and the links will be in the readme) . as far as the output i think that may be because the output has to be github_document? im not sure on that one ive never had that issue but i can look into it. i wouldnt worry about a visually appealing theme unless its something you care about, i didnt pick a theme at all for my pages for project 1 and didnt lose any points for it. i think unless its in the grading rubric or notes on grading on the project 2 document then we wont get dinged for it. i proabably wont be on later today after i finish my commentary but if you have any issues feel free to text me at 7192898738 or email me at dlsamara@ncsu.edu and i will get on (or tomorrow morning depending on the time) and we can make sure to get everything working for the submission tomorrow. 
+
+
 ```
 
-```{r setup}
+```{r setup , include=FALSE}
 
 ## DELETE## changed this to eval = FALSE so it would knit on my machine please feel free to change back if i forget
 knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
-setwd("C:/Documents/Github/ST_558_Project_2")
+#setwd("C:/Documents/Github/ST_558_Project_2")
+setwd("C:/Users/Demetri/Documents/NCSU_masters/ST558/Repos/GitHub/ST_558_Project_2")
 options(scipen = 1, digits = 6)
 ```
 
@@ -83,16 +85,14 @@ In this report we will be looking at the `r params$DataChannel` data channel of 
 
 ## Read in the Data
 
-<<<<<<< HEAD
-```{r data, echo=TRUE, message=FALSE, warning=FALSE}
-=======
-```{r data, echo=TRUE, message=FALSE, warning=FALSE, eval=TRUE}
->>>>>>> b0bd77251d390b9ca0b8513ce1cc03385eed367a
-## DELETE## changed this so it would knit on my machine feel free to change it back if I forget to
 
-setwd("C:/Documents/Github/ST_558_Project_2")
-# setwd("C:/Users/Demetri/Documents/NCSU_masters/ST558/Repos/GitHub/ST_558_Project_2")
-##Delete## I learned this trick while working my summer internship. When you are collaborating with people, put your project in your documents in a folder named Github. Everyone collaborating does the same. Then we have the same working directory. I just commented your working directory out so it would run the code for me, while you're working, fill free to comment mine out and uncomment yours.
+```{r data, echo=TRUE, message=FALSE, warning=FALSE}
+
+
+
+#setwd("C:/Documents/Github/ST_558_Project_2")
+setwd("C:/Users/Demetri/Documents/NCSU_masters/ST558/Repos/GitHub/ST_558_Project_2")
+##Delete## I learned this trick while working my summer internship. When you are collaborating with people, put your project in your documents in a folder named Github. Everyone collaborating does the same. Then we have the same working directory. I just commented your working directory out so it would run the code for me, while you're working, fill free to comment mine out and uncomment yours. ## Oh dang that is a good idea haha i will definitly do that next time 
 
 online <- read.csv('OnlineNewsPopularity.csv')
 colnames(online) <- c('url', 'days', 'n.Title', 'n.Content', 'Rate.Unique', 
@@ -113,9 +113,7 @@ colnames(online) <- c('url', 'days', 'n.Title', 'n.Content', 'Rate.Unique',
 #Dropped url and timedelta because they are non-predictive. 
 online <- online[ , c(3:61)]
 
-#All trained data sets are in another .Rmd file called Create_dataframes_use_later. These can be copy and pasted when they are necessary
 
-## I'm not 100% sure but I think we are supposed to run this same process with the different params set up. so its like just one doc that we knit with the six different params and it goes through and does everything without us needing to copy and paste 
 ```
 
 ## Write Functions
@@ -174,15 +172,15 @@ correlation_graph <- function(data_input,sig=0.5){
 # scatterplots(lifestyle_train)
 ```
 
-<<<<<<< HEAD
+
 ## `r params$DataChannel` EDA
-=======
+
 
 
 ` 
 
 ### `r params$DataChannel` 
->>>>>>> b0bd77251d390b9ca0b8513ce1cc03385eed367a
+
 
 ```{r automation creation of each data set, message=FALSE }
 
@@ -220,22 +218,11 @@ data_channel_test <- data_channel[test, ]
 summary_table(data_channel_train)
 ```
 
-<<<<<<< HEAD
+
 ```{r params$DataChannel_corr_table}
-=======
-```{r lifestyle_train_test}
-#Split the data into training and test
-set.seed(5432)
 
-# Split the data into a training and test set (70/30 split)
-# indices
+## this had the lifestyle stuff, i deleted it because we dont want there to be lifestyle in the other data channel documents. 
 
-train <- sample(1:nrow(lifestyle), size = nrow(lifestyle)*.70)
-test <- setdiff(1:nrow(lifestyle), train)
-
-# trainiing and testing subsets
-lifestyle_train <- lifestyle[train, ]
-lifestyle_test <- lifestyle[test, ]
 ```
 
 ## `r params$DataChannel` Summarizations 
@@ -246,7 +233,7 @@ summary_table(data_channel_train)
 ```
 
 ```{r lifestyle_corr_table}
->>>>>>> b0bd77251d390b9ca0b8513ce1cc03385eed367a
+
 #Correlation table for lifestyle_train
 correlation_table(data_channel_train)
 ```
@@ -256,8 +243,7 @@ correlation_table(data_channel_train)
 correlation_graph(data_channel_train)
 ```
 
-<<<<<<< HEAD
-=======
+
 
 ```{r contingency tables }
 ## mean of shares 
@@ -300,7 +286,7 @@ b+ geom_col(fill="blue")+ ggtitle("Number of words in title vs shares") + labs(x
 ```
 
 
->>>>>>> b0bd77251d390b9ca0b8513ce1cc03385eed367a
+
 ```{r correlations between shares and other variables, eval=TRUE }
 ## makes correlation of every variable with shares 
 shares_correlations <- cor(data_channel_train)[1,] %>% sort() 
@@ -314,14 +300,14 @@ shares_correlations
 ## take the name of the highest correlated variable
 highest_cor <-shares_correlations[52]  %>% names()
 
+highest_cor
+
 ## creats scatter plot looking at shares vs highest correlated variable
 g <-ggplot(data_channel_train,  aes(y=shares, x= data_channel_train[[highest_cor]])) 
 
-<<<<<<< HEAD
-g+ geom_point() + labs() + ggtitle(" Highest correlated variable with shares")
-=======
+
 g+ geom_point(aes(color=as.factor(Weekend))) +geom_smooth(method = lm) + ggtitle(" Highest correlated variable with shares") + labs(x="Highest correlated variable vs shares", color="Weekend")
->>>>>>> b0bd77251d390b9ca0b8513ce1cc03385eed367a
+
 
 ```
 
@@ -376,7 +362,7 @@ linear_2_RMSE<- postResample(linear_model_2_pred, obs = data_channel_test$shares
 
 ### Random forest model
 
-```{r random_forest, cache=TRUE}
+```{r random_forest }
 set.seed(10210526)
 rfFit <- train(shares ~ ., 
         data = data_channel_train,
@@ -402,10 +388,8 @@ rfRMSE<- postResample(rfFit_pred, obs =
 
 ### Boosted tree model
 
-```{r boosted tree tuning, cache=TRUE}
-
-## cross validation on boosted tree method to find optima tuning parameters 
-## DELETE after ## I'm really confused as to why higher values are not giving better rsme for tuning I'm going to go to office hours 7/3 to try to figure out. will use random parameters for now  ## 
+```{r boosted tree tuning }
+ 
 
 ## creates grid of possible tuning parameters 
 gbm_grid <-  expand.grid(interaction.depth = c(1,4,7), 
@@ -448,6 +432,8 @@ models_RMSE <- data.frame(linear_1_RMSE=linear_1_RMSE[1],
                           boosted_tree_RMSE =
                            boosted_tree_RMSE[1] )
 
+models_RMSE
+
 ## gets the name of the column with the smallest rmse 
 smallest_RMSE<-colnames(models_RMSE)[apply(models_RMSE,1,which.min)]
 
@@ -460,11 +446,9 @@ paste0(" For ",
 
 ## Automation
 
-<<<<<<< HEAD
-This is the code used to automate the rendering of each document based on the parameter designated in the YAML.
-=======
+
 This is the code used to automate the rendering of each document based on the parameter of data_channel_is designated in the YAML. 
->>>>>>> b0bd77251d390b9ca0b8513ce1cc03385eed367a
+
 
 ```{r render with params code, echo=TRUE, eval=FALSE}
 
@@ -483,7 +467,7 @@ reports <- tibble(output_file, params)
 ## renders with params to all based on rows in reports
 apply(reports, MARGIN=1, FUN = function(x){
 ## change output_dir to whatever folder you want it to output to   
-rmarkdown::render('C:/Documents/Github/ST_558_Project_2/_Rmd/Automation_test.Rmd', output_dir = "./automations_test_html", output_file = x[[1]], params = x[[2]]
+rmarkdown::render('C:/Documents/Github/ST_558_Project_2/_Rmd/ST_558_project_2', output_dir = "./automations_test_html", output_file = x[[1]], params = x[[2]]
     )
   }
 )
