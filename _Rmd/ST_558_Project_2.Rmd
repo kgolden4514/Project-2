@@ -79,7 +79,7 @@ In this report we will be looking at the `r params$DataChannel` data channel of 
 
 ## Read in the Data
 
-```{r data, echo=FALSE, message=FALSE, warning=FALSE, eval=TRUE}
+```{r data, echo=TRUE, message=FALSE, warning=FALSE, eval=TRUE}
 ## DELETE## changed this so it would knit on my machine feel free to change it back if I forget to
 
 #setwd("C:/Documents/Github/ST_558_Project_2")
@@ -152,9 +152,9 @@ correlation_graph <- function(data_input,sig=0.5){
 
 
 
-## `r params$DataChannel` 
+` 
 
-### `r params$DataChannel` EDA
+### `r params$DataChannel` 
 
 ```{r automation creation of each data set, message=FALSE }
 
@@ -222,28 +222,69 @@ lifestyle_test <- lifestyle[test, ]
 
 ```{r lifestyle_summary}
 #Shares table for lifestyle_train
-summary_table(lifestyle_train)
+summary_table(data_channel_train)
 ```
 
 ```{r lifestyle_corr_table}
 #Correlation table for lifestyle_train
-correlation_table(lifestyle_train)
+correlation_table(data_channel_train)
 ```
 
 ```{r lifestyle_corr_graph}
 #Correlation graph for lifestyle_train
-correlation_graph(lifestyle_train)
+correlation_graph(data_channel_train)
 ```
 
 
+```{r contingency tables }
+## mean of shares 
+mean(data_channel_train$shares)
+
+## sd of shares 
+sd(data_channel_train$shares)
+
+## creates a new column that is if shares is higher than average or not 
+shareshigh <- data_channel_train %>% select(shares) %>% mutate (shareshigh = (shares> mean(shares)))
+
+## creates a contingency table of shareshigh and whether it is the weekend 
+table(shareshigh$shareshigh, data_channel_train$Weekend)
+
+## creates  a contingency table of shareshigh and whether it is monday 
+table(shareshigh$shareshigh, data_channel_train$Mon)
+
+```
+
+
+```{r shares histogram }
+## creates plotting object of shares
+a <- ggplot(data_channel_train, aes(x=shares))
+
+## histogram of shares 
+a+geom_histogram(color= "red", fill="blue")+ ggtitle("Shares histogram")
+
+```
+
+
+```{r col graph }
+## creates plotting object with number of words in title and shares
+b<- ggplot(data_channel_train, aes(x=n.Title, y=shares))
+
+## creates a bar chart with number of words in title and shares 
+b+ geom_col(fill="blue")+ ggtitle("Number of words in title vs shares") + labs(x="Number of words in title")
+
+
+
+```
+
 
 ```{r correlations between shares and other variables, eval=TRUE }
-## makes least to most of the correlation of every variable with shares 
+## makes correlation of every variable with shares 
 shares_correlations <- cor(data_channel_train)[1,] %>% sort() 
 
 shares_correlations
 
 ```
+
 
 ```{r graph of shares with highest correlated var}
 ## take the name of the highest correlated variable
@@ -252,21 +293,11 @@ highest_cor <-shares_correlations[52]  %>% names()
 ## creats scatter plot looking at shares vs highest correlated variable
 g <-ggplot(data_channel_train,  aes(y=shares, x= data_channel_train[[highest_cor]])) 
 
-g+ geom_point() + labs + ggtitle(" Highest correlated variable with shares")
+g+ geom_point(aes(color=as.factor(Weekend))) +geom_smooth(method = lm) + ggtitle(" Highest correlated variable with shares") + labs(x="Highest correlated variable vs shares", color="Weekend")
 
 ```
 
-```{r cpntogency table }
-#at least 2 factors 
-#shares exceeded median and wether program was on the weekend 
-#wether or not it was the weekend 
-# cut() 
-#online %>% select(shares) %>% mutate (shareshigh> mean shares)
 
-#is weekend shares high %>% table prop table relative freq
-
-# prop.table(margin= "isweekend")
-```
 
 
 
@@ -404,7 +435,7 @@ paste0(" For ",
 
 ## Automation 
 
-This is the code used to automate the rendering of each document based on the parameter designated in the YAML. 
+This is the code used to automate the rendering of each document based on the parameter of data_channel_is designated in the YAML. 
 
 ```{r render with params code, echo=TRUE, eval=FALSE}
 
