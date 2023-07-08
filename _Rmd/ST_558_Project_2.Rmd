@@ -83,7 +83,11 @@ In this report we will be looking at the `r params$DataChannel` data channel of 
 
 ## Read in the Data
 
+<<<<<<< HEAD
 ```{r data, echo=TRUE, message=FALSE, warning=FALSE}
+=======
+```{r data, echo=TRUE, message=FALSE, warning=FALSE, eval=TRUE}
+>>>>>>> b0bd77251d390b9ca0b8513ce1cc03385eed367a
 ## DELETE## changed this so it would knit on my machine feel free to change it back if I forget to
 
 setwd("C:/Documents/Github/ST_558_Project_2")
@@ -170,7 +174,15 @@ correlation_graph <- function(data_input,sig=0.5){
 # scatterplots(lifestyle_train)
 ```
 
+<<<<<<< HEAD
 ## `r params$DataChannel` EDA
+=======
+
+
+` 
+
+### `r params$DataChannel` 
+>>>>>>> b0bd77251d390b9ca0b8513ce1cc03385eed367a
 
 ```{r automation creation of each data set, message=FALSE }
 
@@ -208,7 +220,33 @@ data_channel_test <- data_channel[test, ]
 summary_table(data_channel_train)
 ```
 
+<<<<<<< HEAD
 ```{r params$DataChannel_corr_table}
+=======
+```{r lifestyle_train_test}
+#Split the data into training and test
+set.seed(5432)
+
+# Split the data into a training and test set (70/30 split)
+# indices
+
+train <- sample(1:nrow(lifestyle), size = nrow(lifestyle)*.70)
+test <- setdiff(1:nrow(lifestyle), train)
+
+# trainiing and testing subsets
+lifestyle_train <- lifestyle[train, ]
+lifestyle_test <- lifestyle[test, ]
+```
+
+## `r params$DataChannel` Summarizations 
+
+```{r lifestyle_summary}
+#Shares table for lifestyle_train
+summary_table(data_channel_train)
+```
+
+```{r lifestyle_corr_table}
+>>>>>>> b0bd77251d390b9ca0b8513ce1cc03385eed367a
 #Correlation table for lifestyle_train
 correlation_table(data_channel_train)
 ```
@@ -218,13 +256,59 @@ correlation_table(data_channel_train)
 correlation_graph(data_channel_train)
 ```
 
+<<<<<<< HEAD
+=======
+
+```{r contingency tables }
+## mean of shares 
+mean(data_channel_train$shares)
+
+## sd of shares 
+sd(data_channel_train$shares)
+
+## creates a new column that is if shares is higher than average or not 
+shareshigh <- data_channel_train %>% select(shares) %>% mutate (shareshigh = (shares> mean(shares)))
+
+## creates a contingency table of shareshigh and whether it is the weekend 
+table(shareshigh$shareshigh, data_channel_train$Weekend)
+
+## creates  a contingency table of shareshigh and whether it is monday 
+table(shareshigh$shareshigh, data_channel_train$Mon)
+
+```
+
+
+```{r shares histogram }
+## creates plotting object of shares
+a <- ggplot(data_channel_train, aes(x=shares))
+
+## histogram of shares 
+a+geom_histogram(color= "red", fill="blue")+ ggtitle("Shares histogram")
+
+```
+
+
+```{r col graph }
+## creates plotting object with number of words in title and shares
+b<- ggplot(data_channel_train, aes(x=n.Title, y=shares))
+
+## creates a bar chart with number of words in title and shares 
+b+ geom_col(fill="blue")+ ggtitle("Number of words in title vs shares") + labs(x="Number of words in title")
+
+
+
+```
+
+
+>>>>>>> b0bd77251d390b9ca0b8513ce1cc03385eed367a
 ```{r correlations between shares and other variables, eval=TRUE }
-## makes least to most of the correlation of every variable with shares 
+## makes correlation of every variable with shares 
 shares_correlations <- cor(data_channel_train)[1,] %>% sort() 
 
 shares_correlations
 
 ```
+
 
 ```{r graph of shares with highest correlated var}
 ## take the name of the highest correlated variable
@@ -233,21 +317,15 @@ highest_cor <-shares_correlations[52]  %>% names()
 ## creats scatter plot looking at shares vs highest correlated variable
 g <-ggplot(data_channel_train,  aes(y=shares, x= data_channel_train[[highest_cor]])) 
 
+<<<<<<< HEAD
 g+ geom_point() + labs() + ggtitle(" Highest correlated variable with shares")
+=======
+g+ geom_point(aes(color=as.factor(Weekend))) +geom_smooth(method = lm) + ggtitle(" Highest correlated variable with shares") + labs(x="Highest correlated variable vs shares", color="Weekend")
+>>>>>>> b0bd77251d390b9ca0b8513ce1cc03385eed367a
 
 ```
 
-```{r cpntogency table }
-#at least 2 factors 
-#shares exceeded median and wether program was on the weekend 
-#wether or not it was the weekend 
-# cut() 
-#online %>% select(shares) %>% mutate (shareshigh> mean shares)
 
-#is weekend shares high %>% table prop table relative freq
-
-# prop.table(margin= "isweekend")
-```
 
 ## Modeling
 
@@ -382,7 +460,11 @@ paste0(" For ",
 
 ## Automation
 
+<<<<<<< HEAD
 This is the code used to automate the rendering of each document based on the parameter designated in the YAML.
+=======
+This is the code used to automate the rendering of each document based on the parameter of data_channel_is designated in the YAML. 
+>>>>>>> b0bd77251d390b9ca0b8513ce1cc03385eed367a
 
 ```{r render with params code, echo=TRUE, eval=FALSE}
 
@@ -398,9 +480,9 @@ params = lapply(data_channel_is, FUN = function(x){list(DataChannel = x)})
 #put into a data frame
 reports <- tibble(output_file, params)
 
-## renders with params to all 
+## renders with params to all based on rows in reports
 apply(reports, MARGIN=1, FUN = function(x){
-  
+## change output_dir to whatever folder you want it to output to   
 rmarkdown::render('C:/Documents/Github/ST_558_Project_2/_Rmd/Automation_test.Rmd', output_dir = "./automations_test_html", output_file = x[[1]], params = x[[2]]
     )
   }
