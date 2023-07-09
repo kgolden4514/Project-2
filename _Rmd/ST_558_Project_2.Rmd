@@ -8,8 +8,6 @@ params:
 ---
 
 ```{r render with params, eval=FALSE, include=FALSE}
-## DELETE## This will also only knit htmls, we have to change the output to github_document and use the one at the bottom to get it to generate github documents  
-
 ## creates a list of all 6 desired params from online
 data_channel_is <- c("Lifestyle", "Entertainment", "Business", "Social.Media", "Tech", "World")
 
@@ -28,24 +26,9 @@ rmarkdown::render('C:/Documents/Github/ST_558_Project_2/_Rmd/ST_558_Project_2.Rm
     )
   }
 )
-
-
-##Delete## So, I changed all necessary inputs to data_channel_train and data_channel_test. I can change the default YAML and see that it does create do everything for the data channel specified in the YAML. That's awesome! But, it is running all 6 data channels at once? If that is the case, where are the htmls going for each data channel? I see the folder with htmls in it, but the htmls have a bunch of 0s and 1s. 
-
-## DELETe## so i think the issue may be you have to run the actual code chuck and then change the "c:/Users towhatever the path of this file is on your device and then the output_dir to whereever you want the 6 documents to render ( you can see all 6 rendered from running this code chunk in the automations_test folder ). but it wont work if you knit it the normal way. we will also need to make sure it is giuthub_document for the final so it shows up properly 
-
-
-
-##About the written commentary, are we supposed to provide that for every data_channel? If so, how are we automating that? We still need to add the factor contingency graphs. Do we want to set a binary to shares like we did for the HW8 for rented bike count? If so, what is your suggestion? I do not mind making the tables for that. As far as the blog post goes, I do not mind writing it. I do have trouble with github in the following ways 1.) Even though I use and .md file, getting my output images to show up in my blog posts, 2.) I do not know how to set a visually appealing theme.
-
-## DELETE## i dont think so. so we just need to write general commentary where the project says "As you will automate this same analysis across other data, you can’t describe the trends you see in the graph (unless you want to try to automate that!)" which i honestly dont want to try to automate that lol and i dont think we get any points for that so unless you really want to automate i would just write general commentary. as far as the contigency tables and graphs i think the project says we are both supposed to make some contigency tables and three graphs, "Each group member is responsible for producing some summary statistics (means, sds, contingency tables, etc.) and for producing at least three graphs (each) of the data."  so for my contigency tables (make sure these are two way tables i asked him and he emphatically said two way tables lol) i just did shares like a factor of above or below the mean shares (called it shareshigh) and then compared it to the weekend and monday and then made a histogram and col graph and scatterplot of some differnt variables. so i would just do something along those lines with whatever variables you think are interesting.  i think we also both have to write out own blog post but like i will use the links to your repo and pages, we dont have to put the actual docs in the blog ( they will be in the repo and the links will be in the readme) . as far as the output i think that may be because the output has to be github_document? im not sure on that one ive never had that issue but i can look into it. i wouldnt worry about a visually appealing theme unless its something you care about, i didnt pick a theme at all for my pages for project 1 and didnt lose any points for it. i think unless its in the grading rubric or notes on grading on the project 2 document then we wont get dinged for it. sorry i wrote so much! i proabably wont be on later today after i finish my commentary but if you have any issues feel free to text me at 7192898738 or email me at dlsamara@ncsu.edu and i will get on (or tomorrow morning depending on the time) and we can make sure everything is working for the submission tomorrow. 
-
-
 ```
 
 ```{r setup , include=FALSE}
-
-## DELETE## changed this to eval = FALSE so it would knit on my machine please feel free to change back if i forget
 knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
 setwd("C:/Documents/Github/ST_558_Project_2")
 #setwd("C:/Users/Demetri/Documents/NCSU_masters/ST558/Repos/GitHub/ST_558_Project_2")
@@ -128,15 +111,14 @@ summary_table <- function(data_input) {
     max <- max(data_input$shares)
     mean1 <- mean(data_input$shares)
     sd1 <- sd(data_input$shares)
-    Summary <- as.data.frame(cbind(min, q1, med, q3, max,
-                                   mean1, sd1))
-    colnames(Summary) <- c("Minimum", "Q1", "Median", "Q3",
+    data <- matrix(c(min, q1, med, q3, max, mean1, sd1), 
+                   ncol=1)
+    rownames(data) <- c("Minimum", "Q1", "Median", "Q3",
                            "Maximum", "Mean", "SD")
-    rownames(Summary) <- c("Shares")
-    out <- Summary
-    return(out)
+    colnames(data) <- c('Shares')
+    data <- as.table(data)
+    data
 }
-  
 ```
 
 ```{r correlation_table}
@@ -203,6 +185,7 @@ data_channel_test <- data_channel[test, ]
 ```{r r params$DataChannel summary_table}
 #Shares table for data_channel_train
 summary_table(data_channel_train)
+   
 ```
 
 The above table displays the `r params$DataChannel` 5-number summary for the shares. It also includes the mean and standard deviation. Because the mean is greater than the median, we suspect that the `r params$DataChannel` shares distribution is right skewed.
@@ -222,19 +205,14 @@ correlation_graph(data_channel_train)
 Because the correlation table above is large, it can be difficult to read. The correlation graph above gives a visual summary of the table. Using the legend, we are able to see the correlations between variables, how strong the correlation is, and in what direction.
 
 ```{r scatterplot}
-## Delete## should this be data_channel_train not shares high? 
 ggplot(shareshigh, aes(x=Rate.Pos, y=Rate.Neg,
                        color=Days_of_Week)) +
     geom_point(size=2)
 ```
 
-Once seeing the correlation table and graph, it is possible to graph two variables on a scatterplot. This provides a visual of the linear relationship. A scatterplot of two variables in the `params$DataChannel` dataset has been created above.
+Once seeing the correlation table and graph, it is possible to graph two variables on a scatterplot. This provides a visual of the linear relationship. A scatterplot of two variables in the `r params$DataChannel` dataset has been created above.
 
 ```{r contingency tables }
-
-## DELETe## should i delete these and do differnt contigency tables since you did a better version of this with every day of the week? 
-
-
 ## mean of shares 
 mean(data_channel_train$shares)
 
@@ -247,12 +225,9 @@ shareshigh <- data_channel_train %>% select(shares) %>% mutate (shareshigh = (sh
 ## creates a contingency table of shareshigh and whether it is the weekend 
 table(shareshigh$shareshigh, data_channel_train$Weekend)
 
-## creates  a contingency table of shareshigh and whether it is monday 
-table(shareshigh$shareshigh, data_channel_train$Mon)
-
 ```
 
-These above contingency tables will look at the shareshigh factor which says whether the number of shares is higher than the mean number of shares or not and compares it to both the weekend and Monday. Using these we can see if the number of shares tends to be higher or not on the weekend and on Monday
+These above contingency tables will look at the shareshigh factor which says whether the number of shares is higher than the mean number of shares or not and compares it to the weekend. Using these we can see if the number of shares tends to be higher or not on the weekend.
 
 ```{r weekday tables}
 ## creates a new column that is if shares is higher than average or not 
@@ -293,8 +268,10 @@ The contingency table above looks at the before-mentioned shareshigh factor and 
 
 ```{r days of week}
 ## creates  a contingency table of shareshigh and the day of the week
-print(prop.table(table(shareshigh$Days_of_Week,
-                 shareshigh$shareshigh)))
+a <- prop.table(table(shareshigh$Days_of_Week,
+                 shareshigh$shareshigh))
+b <- as.data.frame(a)
+print(a)
 ```
 
 After comparing shareshigh with whether or not the day was a weekend or weekday, the above contingency table compares shareshigh for each specific day of the week. Again, the frequencies are displayed as relative frequencies.
@@ -313,6 +290,29 @@ ggplot(shareshigh, aes(x = Days_of_Week, fill = shareshigh)) +
 
 The above bar graphs are a visual representation of the contingency tables between weekends/weekdays and shareshigh and the days of the week and shareshigh.. Graphs can improve the stakeholders ability to interpret the results quickly.
 
+```{r most frequent}
+
+a <- table(shareshigh$Days_of_Week)
+# a <- prop.table(table(shareshigh$Days_of_Week,
+#                  shareshigh$shareshigh))
+b <- as.data.frame(a)
+colnames(b) <- c('Day of Week', 'Freq')
+b <- filter(b, Freq == max(b$Freq))
+d <- as.character(b[1,1])
+g <- mutate(shareshigh, 
+                  Most_Freq = ifelse(Days_of_Week == d,
+                                    'Most Freq Day',
+                                    'Not Most Freq Day'
+                                    ))
+paste0(" For ", 
+        params$DataChannel, " ", 
+       d, " is the most frequent day of the week")
+
+table(shareshigh$shareshigh, g$Most_Freq)
+```
+
+The above contingency table compares shareshigh to the `r params$DataChannel` day that occurs most frequently. This allows us to see if the most frequent day tends to have more shareshigh.
+
 ```{r shares histogram }
 ## creates plotting object of shares
 a <- ggplot(data_channel_train, aes(x=shares))
@@ -330,9 +330,6 @@ b<- ggplot(data_channel_train, aes(x=n.Title, y=shares))
 
 ## creates a bar chart with number of words in title and shares 
 b+ geom_col(fill="blue")+ ggtitle("Number of words in title vs shares") + labs(x="Number of words in title")
-
-
-
 ```
 
 In the above graph we are looking at the number of shares based on how many words are in the title of the article. if we see a large peak on at the higher number of words it means for this data channel there were more shares on longer titles, and if we see a peak at smaller number of words then there were more shares on smaller titles.
@@ -342,7 +339,6 @@ In the above graph we are looking at the number of shares based on how many word
 shares_correlations <- cor(data_channel_train)[1,] %>% sort() 
 
 shares_correlations
-
 ```
 
 ```{r graph of shares with highest correlated var}
@@ -356,8 +352,6 @@ g <-ggplot(data_channel_train,  aes(y=shares, x= data_channel_train[[highest_cor
 
 
 g+ geom_point(aes(color=as.factor(Weekend))) +geom_smooth(method = lm) + ggtitle(" Highest correlated variable with shares") + labs(x="Highest correlated variable vs shares", color="Weekend")
-
-
 ```
 
 The above graph looks at the relationship between shares and the variable with the highest correlation for the `r params$DataChannel` data channel, and colored based on whether or not it is the weekend. because this is the most positively correlated variable we should always see an upward trend but the more correlated they are the more the dots will fall onto the line of best fit.
@@ -370,7 +364,7 @@ Linear regression is a tool with many applications available to data scientists.
 
 ### Linear regression 1
 
-```{r Linear regression 1 }
+```{r Linear regression 1, message=FALSE, warning=FALSE}
 ## linear regression model using all predictors 
 set.seed(13)
 
@@ -391,7 +385,7 @@ linear_1_RMSE<- postResample(linear_model_1_pred, obs = data_channel_test$shares
 
 ### Linear regression 2
 
-```{r Linear regression 2 }
+```{r Linear regression 2, message=FALSE, warning=FALSE}
 
 #Removed rate.Nonstop because it was only 1 and removed the days of the week.
 linear_model_2 <- train( shares ~. - Rate.Nonstop - Mon
@@ -431,11 +425,6 @@ rfFit <- train(shares ~ .,
 rfFit_pred <- predict(rfFit, newdata = data_channel_test)
 rfRMSE<- postResample(rfFit_pred, obs =
                             data_channel_test$shares)
-
-##Delete## I will try again to add a tuneGrid to the random forest tomorrow later today
-
-
-
 ```
 
 ### Boosted tree model
@@ -519,7 +508,7 @@ reports <- tibble(output_file, params)
 ## renders with params to all based on rows in reports
 apply(reports, MARGIN=1, FUN = function(x){
 ## change first path to wherever yours is and output_dir to whatever folder you want it to output to   
-rmarkdown::render('C:/Documents/Github/ST_558_Project_2/_Rmd/ST_558_project_2', output_dir = "./automations_test2_html", output_file = x[[1]], params = x[[2]]
+rmarkdown::render('C:/Documents/Github/ST_558_Project_2/_Rmd/ST_558_Project_2.Rmd', output_dir = "./automations_test2_md", output_file = x[[1]], params = x[[2]]
     )
   }
 )
