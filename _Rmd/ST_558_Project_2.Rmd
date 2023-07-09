@@ -22,7 +22,7 @@ reports <- tibble(output_file, params)
 ## renders with params to all 
 apply(reports, MARGIN=1, FUN = function(x){
   
-rmarkdown::render("C:/Users/Demetri/Documents/NCSU_masters/ST558/Repos/GitHub/ST_558_Project_2/_Rmd/ST_558_Project_2.Rmd", output_dir = "./automations_test_html", output_file = x[[1]], params = x[[2]]
+rmarkdown::render("C:/Users/Demetri/Documents/NCSU_masters/ST558/Repos/GitHub/ST_558_Project_2/_Rmd/ST_558_Project_2.Rmd", output_dir = "./automations_test2_html", output_file = x[[1]], params = x[[2]]
     )
   }
 )
@@ -36,7 +36,7 @@ rmarkdown::render("C:/Users/Demetri/Documents/NCSU_masters/ST558/Repos/GitHub/ST
 
 ##About the written commentary, are we supposed to provide that for every data_channel? If so, how are we automating that? We still need to add the factor contingency graphs. Do we want to set a binary to shares like we did for the HW8 for rented bike count? If so, what is your suggestion? I do not mind making the tables for that. As far as the blog post goes, I do not mind writing it. I do have trouble with github in the following ways 1.) Even though I use and .md file, getting my output images to show up in my blog posts, 2.) I do not know how to set a visually appealing theme.
 
-## DELETE## i dont think so. so we just need to write general commentary where the project says "As you will automate this same analysis across other data, you can’t describe the trends you see in the graph (unless you want to try to automate that!)" which i honestly dont want to try to automate that lol and i dont think we get any points for that so unless you really want to automate i would just write general commentary. as far as the contigency tables and graphs i think the project says we are both supposed to make some contigency tables and three graphs, "Each group member is responsible for producing some summary statistics (means, sds, contingency tables, etc.) and for producing at least three graphs (each) of the data."  so for my contigency tables (make sure these are two way tables i asked him and he emphatically said two way tables lol) i just did shares like a factor of above or below the mean shares (called it shareshigh) and then compared it to the weekend and monday and then made a histogram and col graph and scatterplot of some differnt variables. so i would just do something along those lines with whatever variables you think are interesting.  i think we also both have to write out own blog post but like i will use the links to your repo and pages, we dont have to put the actual docs in the blog ( they will be in the repo and the links will be in the readme) . as far as the output i think that may be because the output has to be github_document? im not sure on that one ive never had that issue but i can look into it. i wouldnt worry about a visually appealing theme unless its something you care about, i didnt pick a theme at all for my pages for project 1 and didnt lose any points for it. i think unless its in the grading rubric or notes on grading on the project 2 document then we wont get dinged for it. i proabably wont be on later today after i finish my commentary but if you have any issues feel free to text me at 7192898738 or email me at dlsamara@ncsu.edu and i will get on (or tomorrow morning depending on the time) and we can make sure to get everything working for the submission tomorrow. 
+## DELETE## i dont think so. so we just need to write general commentary where the project says "As you will automate this same analysis across other data, you can’t describe the trends you see in the graph (unless you want to try to automate that!)" which i honestly dont want to try to automate that lol and i dont think we get any points for that so unless you really want to automate i would just write general commentary. as far as the contigency tables and graphs i think the project says we are both supposed to make some contigency tables and three graphs, "Each group member is responsible for producing some summary statistics (means, sds, contingency tables, etc.) and for producing at least three graphs (each) of the data."  so for my contigency tables (make sure these are two way tables i asked him and he emphatically said two way tables lol) i just did shares like a factor of above or below the mean shares (called it shareshigh) and then compared it to the weekend and monday and then made a histogram and col graph and scatterplot of some differnt variables. so i would just do something along those lines with whatever variables you think are interesting.  i think we also both have to write out own blog post but like i will use the links to your repo and pages, we dont have to put the actual docs in the blog ( they will be in the repo and the links will be in the readme) . as far as the output i think that may be because the output has to be github_document? im not sure on that one ive never had that issue but i can look into it. i wouldnt worry about a visually appealing theme unless its something you care about, i didnt pick a theme at all for my pages for project 1 and didnt lose any points for it. i think unless its in the grading rubric or notes on grading on the project 2 document then we wont get dinged for it. sorry i wrote so much! i proabably wont be on later today after i finish my commentary but if you have any issues feel free to text me at 7192898738 or email me at dlsamara@ncsu.edu and i will get on (or tomorrow morning depending on the time) and we can make sure everything is working for the submission tomorrow. 
 
 
 ```
@@ -45,8 +45,8 @@ rmarkdown::render("C:/Users/Demetri/Documents/NCSU_masters/ST558/Repos/GitHub/ST
 
 ## DELETE## changed this to eval = FALSE so it would knit on my machine please feel free to change back if i forget
 knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
-#setwd("C:/Documents/Github/ST_558_Project_2")
-setwd("C:/Users/Demetri/Documents/NCSU_masters/ST558/Repos/GitHub/ST_558_Project_2")
+setwd("C:/Documents/Github/ST_558_Project_2")
+#setwd("C:/Users/Demetri/Documents/NCSU_masters/ST558/Repos/GitHub/ST_558_Project_2")
 options(scipen = 1, digits = 6)
 ```
 
@@ -90,9 +90,10 @@ In this report we will be looking at the `r params$DataChannel` data channel of 
 
 
 
-#setwd("C:/Documents/Github/ST_558_Project_2")
-setwd("C:/Users/Demetri/Documents/NCSU_masters/ST558/Repos/GitHub/ST_558_Project_2")
-##Delete## I learned this trick while working my summer internship. When you are collaborating with people, put your project in your documents in a folder named Github. Everyone collaborating does the same. Then we have the same working directory. I just commented your working directory out so it would run the code for me, while you're working, fill free to comment mine out and uncomment yours. ## Oh dang that is a good idea haha i will definitly do that next time 
+setwd("C:/Documents/Github/ST_558_Project_2")
+#setwd("C:/Users/Demetri/Documents/NCSU_masters/ST558/Repos/GitHub/ST_558_Project_2")
+##Delete## I learned this trick while working my summer internship. When you are collaborating with people, put your project in your documents in a folder named Github. Everyone collaborating does the same. Then we have the same working directory. I just commented your working directory out so it would run the code for me, while you're working, fill free to comment mine out and uncomment yours. 
+## Oh dang that is a good idea haha i will definitly do that next time 
 
 online <- read.csv('OnlineNewsPopularity.csv')
 colnames(online) <- c('url', 'days', 'n.Title', 'n.Content', 'Rate.Unique', 
@@ -263,6 +264,9 @@ table(shareshigh$shareshigh, data_channel_train$Mon)
 
 ```
 
+These above contingency tables will look at the shareshigh factor which says whether the number of shares is higher than the mean number of shares or not and compares it to both the weekend and Monday. Using these we can see if the number of shares tends to be higher or not on the weekend and on Monday
+
+
 
 ```{r shares histogram }
 ## creates plotting object of shares
@@ -272,6 +276,8 @@ a <- ggplot(data_channel_train, aes(x=shares))
 a+geom_histogram(color= "red", fill="blue")+ ggtitle("Shares histogram")
 
 ```
+
+Above we can see the frequency distribution of the `r params$DataChannel` data channel. We should always see a long tail to the right because a small number of articles will get a very high number of shares. But looking at by looking at the distribution we can say how many shares most of these articles got. 
 
 
 ```{r col graph }
@@ -284,6 +290,8 @@ b+ geom_col(fill="blue")+ ggtitle("Number of words in title vs shares") + labs(x
 
 
 ```
+
+In the above graph we are looking at the number of shares based on how many words are in the title of the article. if we see a large peak on at the higher number of words it means for this data channel there were more shares on longer titles, and if we see a peak at smaller number of words then there were more shares on smaller titles. 
 
 
 
@@ -311,6 +319,7 @@ g+ geom_point(aes(color=as.factor(Weekend))) +geom_smooth(method = lm) + ggtitle
 
 ```
 
+the above graph looks at the relationship between shares and the variable with the highest correlation for the `r params$DataChannel` data channel, and colored based on whether or not it is the weekend. because this is the most positivly correlated variable we should always see an upward trend butthe more correlated they are the more the dots will fall onto the line of best fit. 
 
 
 ## Modeling
@@ -387,6 +396,8 @@ rfRMSE<- postResample(rfFit_pred, obs =
 ```
 
 ### Boosted tree model
+
+A decision tree makes a binary decision based on the value input. A boosted tree model generates a predictive model based on an ensemble of decision trees where better trees are generated based on the performance of previous trees. Our boosted tree model can be tuned using four different parameters: interaction.depth which defines the complexity of the trees being built, n.trees which defines the number of trees built (number of iterations), shrinkage which dictates the rate at which the algorithm learns, and n.minobsinnode which dictates the number of samples left to allow for a node to split. 
 
 ```{r boosted tree tuning }
  
@@ -466,7 +477,7 @@ reports <- tibble(output_file, params)
 
 ## renders with params to all based on rows in reports
 apply(reports, MARGIN=1, FUN = function(x){
-## change output_dir to whatever folder you want it to output to   
+## change first path to wherever yours is and output_dir to whatever folder you want it to output to   
 rmarkdown::render('C:/Documents/Github/ST_558_Project_2/_Rmd/ST_558_project_2', output_dir = "./automations_test_html", output_file = x[[1]], params = x[[2]]
     )
   }
