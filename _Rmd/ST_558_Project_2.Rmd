@@ -2,7 +2,9 @@
 title: "Project 2"
 author: "Kristina Golden and Demetrios Samaras"
 date: "2023-07-02"
-output: github_document
+output: 
+github_document:
+  html_preview: False
 params: 
   DataChannel: "Lifestyle"
 ---
@@ -29,8 +31,8 @@ rmarkdown::render('C:/Documents/Github/ST_558_Project_2/_Rmd/ST_558_Project_2.Rm
 ```
 
 ```{r setup , include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
-setwd("C:/Documents/Github/ST_558_Project_2")
+knitr::opts_chunk$set(echo = TRUE, cache = TRUE, message = FALSE)
+#setwd("C:/Documents/Github/ST_558_Project_2")
 #setwd("C:/Users/Demetri/Documents/NCSU_masters/ST558/Repos/GitHub/ST_558_Project_2")
 options(scipen = 1, digits = 6)
 ```
@@ -74,11 +76,11 @@ In this report we will be looking at the `r params$DataChannel` data channel of 
 
 
 
-setwd("C:/Documents/Github/ST_558_Project_2")
-#setwd("C:/Users/Demetri/Documents/NCSU_masters/ST558/Repos/GitHub/ST_558_Project_2")
+#setwd("C:/Documents/Github/ST_558_Project_2")
+setwd("C:/Users/Demetri/Documents/NCSU_masters/ST558/Repos/GitHub/ST_558_Project_2")
  
 
-online <- read.csv('OnlineNewsPopularity.csv')
+online <- read.csv("OnlineNewsPopularity.csv")
 colnames(online) <- c('url', 'days', 'n.Title', 'n.Content', 'Rate.Unique', 
                       'Rate.Nonstop', 'Rate.Unique.Nonstop', 'n.Links', 
                       'n.Other', 'n.Images', 'n.Videos',
@@ -508,7 +510,12 @@ reports <- tibble(output_file, params)
 ## renders with params to all based on rows in reports
 apply(reports, MARGIN=1, FUN = function(x){
 ## change first path to wherever yours is and output_dir to whatever folder you want it to output to   
-rmarkdown::render('C:/Documents/Github/ST_558_Project_2/_Rmd/ST_558_Project_2.Rmd', output_dir = "./automations_test2_md", output_file = x[[1]], params = x[[2]]
+rmarkdown::render("C:/Users/Demetri/Documents/NCSU_masters/ST558/Repos/GitHub/ST_558_Project_2/_Rmd/ST_558_Project_2.Rmd", 
+                  output_format = "github_document", 
+                  output_dir = ".", 
+                  output_file = x[[1]], 
+                  params = x[[2]],
+                  runtime = "static"
     )
   }
 )
