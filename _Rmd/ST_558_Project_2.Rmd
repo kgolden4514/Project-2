@@ -31,7 +31,7 @@ rmarkdown::render('C:/Documents/Github/ST_558_Project_2/_Rmd/ST_558_Project_2.Rm
 ```
 
 ```{r setup , include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, cache = TRUE, message = FALSE)
+knitr::opts_chunk$set(echo = TRUE, cache = TRUE, eval=TRUE, message = FALSE)
 #setwd("C:/Documents/Github/ST_558_Project_2")
 #setwd("C:/Users/Demetri/Documents/NCSU_masters/ST558/Repos/GitHub/ST_558_Project_2")
 options(scipen = 1, digits = 6)
@@ -414,7 +414,7 @@ linear_2_RMSE<- postResample(linear_model_2_pred, obs = data_channel_test$shares
 
 A random forest model is used in machine learning to generate predictions or classifications. This is done through generating many decision trees on many different samples and taking the average (regression) or the majority vote (classification). Some of the benefits to using random forest models are that over-fitting is minimized and the model works with the presence of categorical and continuous variables. With increased computer power and the increased knowledge in machine learning, random forest models will continue to grow in popularity.
 
-```{r random_forest }
+```{r random_forest, eval=FALSE}
 set.seed(10210526)
 rfFit <- train(shares ~ ., 
         data = data_channel_train,
@@ -473,7 +473,7 @@ boosted_tree_RMSE <- postResample(boosted_tree_model_pred, obs = data_channel_te
 ## creates a data frame of the four models RMSE on the 
 models_RMSE <- data.frame(linear_1_RMSE=linear_1_RMSE[1],
                          linear_2_RMSE=linear_2_RMSE[1], 
-                         rfRMSE=rfRMSE[1],
+                         #rfRMSE=rfRMSE[1],
                           boosted_tree_RMSE =
                            boosted_tree_RMSE[1] )
 

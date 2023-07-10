@@ -5748,15 +5748,15 @@ boosted_tree_RMSE <- postResample(boosted_tree_model_pred, obs = data_channel_te
 ## creates a data frame of the four models RMSE on the 
 models_RMSE <- data.frame(linear_1_RMSE=linear_1_RMSE[1],
                          linear_2_RMSE=linear_2_RMSE[1], 
-                         rfRMSE=rfRMSE[1],
+                         #rfRMSE=rfRMSE[1],
                           boosted_tree_RMSE =
                            boosted_tree_RMSE[1] )
 
 models_RMSE
 ```
 
-    ##      linear_1_RMSE linear_2_RMSE  rfRMSE boosted_tree_RMSE
-    ## RMSE        6436.2       6444.27 6115.59           6228.59
+    ##      linear_1_RMSE linear_2_RMSE boosted_tree_RMSE
+    ## RMSE        6436.2       6444.27           6228.59
 
 ``` r
 ## gets the name of the column with the smallest rmse 
@@ -5768,7 +5768,7 @@ paste0(" For ",
        smallest_RMSE, " is the winner")
 ```
 
-    ## [1] " For Lifestyle rfRMSE is the winner"
+    ## [1] " For Lifestyle boosted_tree_RMSE is the winner"
 
 ## Automation
 
